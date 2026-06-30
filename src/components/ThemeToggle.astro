@@ -1,0 +1,68 @@
+---
+// Light/dark toggle. The initial theme is set pre-paint by the inline script in BaseHead.astro;
+// this button flips `data-theme` on <html> and persists the choice to localStorage.
+---
+
+<button id="theme-toggle" type="button" aria-label="Cambia tema chiaro/scuro" title="Cambia tema">
+	<svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+		<path
+			fill="currentColor"
+			d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0-13a1 1 0 0 1 1 1v1.5a1 1 0 1 1-2 0V5a1 1 0 0 1 1-1Zm0 14a1 1 0 0 1 1 1v1.5a1 1 0 1 1-2 0V19a1 1 0 0 1 1-1ZM4 12a1 1 0 0 1-1 1H1.5a1 1 0 1 1 0-2H3a1 1 0 0 1 1 1Zm19 0a1 1 0 0 1-1 1h-1.5a1 1 0 1 1 0-2H22a1 1 0 0 1 1 1ZM5.64 5.64a1 1 0 0 1 1.42 0l1.06 1.06A1 1 0 0 1 6.7 8.12L5.64 7.06a1 1 0 0 1 0-1.42Zm10.18 10.18a1 1 0 0 1 1.42 0l1.06 1.06a1 1 0 0 1-1.42 1.42l-1.06-1.06a1 1 0 0 1 0-1.42ZM18.36 5.64a1 1 0 0 1 0 1.42l-1.06 1.06a1 1 0 1 1-1.42-1.42l1.06-1.06a1 1 0 0 1 1.42 0ZM8.12 17.3a1 1 0 0 1 0 1.42l-1.06 1.06a1 1 0 0 1-1.42-1.42l1.06-1.06a1 1 0 0 1 1.42 0Z"
+		></path>
+	</svg>
+	<svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+		<path
+			fill="currentColor"
+			d="M21.64 13a1 1 0 0 0-1.05-.14 8 8 0 0 1-3.37.73 8.15 8.15 0 0 1-8.14-8.1 8 8 0 0 1 .25-2A1 1 0 0 0 8 2.36a10.14 10.14 0 1 0 14 11.69 1 1 0 0 0-.36-1.05Z"
+		></path>
+	</svg>
+</button>
+
+<style>
+	#theme-toggle {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.4em;
+		height: 2.4em;
+		padding: 0;
+		border: none;
+		background: transparent;
+		color: var(--accent);
+		cursor: pointer;
+		border-radius: 8px;
+	}
+	#theme-toggle:hover {
+		background: rgb(var(--gray-light));
+	}
+	/* Show the icon for the action the button performs: moon in light mode, sun in dark. */
+	.icon-sun {
+		display: none;
+	}
+	:global(:root[data-theme='dark']) .icon-sun {
+		display: inline;
+	}
+	:global(:root[data-theme='dark']) .icon-moon {
+		display: none;
+	}
+</style>
+
+<script is:inline>
+	(() => {
+		const btn = document.getElementById('theme-toggle');
+		if (!btn) return;
+		const sync = () => {
+			const isDark = document.documentElement.dataset.theme === 'dark';
+			btn.setAttribute('aria-pressed', String(isDark));
+			btn.setAttribute('aria-label', isDark ? 'Passa al tema chiaro' : 'Passa al tema scuro');
+		};
+		sync();
+		btn.addEventListener('click', () => {
+			const root = document.documentElement;
+			const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+			root.dataset.theme = next;
+			localStorage.setItem('theme', next);
+			sync();
+		});
+	})();
+</script>

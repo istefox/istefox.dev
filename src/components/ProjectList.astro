@@ -1,0 +1,73 @@
+---
+import type { Project } from '../data/projects';
+
+interface Props {
+	projects: Project[];
+	headingLevel?: 'h2' | 'h3';
+}
+
+const { projects, headingLevel = 'h3' } = Astro.props;
+const HeadingTag = headingLevel;
+---
+
+<ul class="projects">
+	{
+		projects.map((project) => (
+			<li class="project">
+				<HeadingTag class="project-name">
+					{project.url ? (
+						<a href={project.url} target="_blank" rel="noopener noreferrer">
+							{project.name}
+						</a>
+					) : (
+						<span>{project.name}</span>
+					)}
+				</HeadingTag>
+				<p class="project-desc">{project.description}</p>
+			</li>
+		))
+	}
+</ul>
+
+<style>
+	.projects {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		gap: 1.5rem;
+	}
+	@media (min-width: 640px) {
+		.projects {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+	.project {
+		padding: 1.25rem 1.5rem;
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: 12px;
+		background: rgb(var(--bg-elevated));
+		transition: border-color 0.2s ease, box-shadow 0.2s ease;
+	}
+	.project:hover {
+		border-color: var(--accent);
+		box-shadow: var(--box-shadow);
+	}
+	.project-name {
+		margin: 0 0 0.4rem 0;
+		font-size: 1.25rem;
+		line-height: 1.2;
+	}
+	.project-name a {
+		text-decoration: none;
+	}
+	.project-name a:hover {
+		text-decoration: underline;
+	}
+	.project-desc {
+		margin: 0;
+		color: rgb(var(--gray-dark));
+		font-size: 1rem;
+		line-height: 1.5;
+	}
+</style>

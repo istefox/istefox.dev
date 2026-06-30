@@ -1,0 +1,40 @@
+---
+import { CONTACTS } from '../consts';
+const today = new Date();
+---
+
+<footer>
+	<div class="contacts">
+		<a href={CONTACTS.github} target="_blank" rel="noopener noreferrer">GitHub</a>
+		<a href={CONTACTS.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a>
+		<a href={`mailto:${CONTACTS.email}`}>Email</a>
+		<a href={CONTACTS.company} target="_blank" rel="noopener noreferrer">Vibrofer</a>
+	</div>
+	<p class="copyright">&copy; {today.getFullYear()} Stefano Ferri</p>
+</footer>
+<style>
+	footer {
+		padding: 2em 1em 4em 1em;
+		background: linear-gradient(var(--gray-gradient)) no-repeat;
+		color: rgb(var(--gray));
+		text-align: center;
+	}
+	.contacts {
+		display: flex;
+		justify-content: center;
+		flex-wrap: wrap;
+		gap: 1.25em;
+		margin-bottom: 0.75em;
+	}
+	.contacts a {
+		color: rgb(var(--gray-dark));
+		text-decoration: none;
+	}
+	.contacts a:hover {
+		color: var(--accent);
+	}
+	.copyright {
+		margin: 0;
+		font-size: 0.9em;
+	}
+</style>

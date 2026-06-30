@@ -1,0 +1,136 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import ProjectList from '../components/ProjectList.astro';
+import { featuredProjects } from '../data/projects';
+import { SITE_TITLE, SITE_DESCRIPTION, SITE_HERO, BIO_EXCERPT, CONTACTS } from '../consts';
+
+const latestPosts = (await getCollection('blog'))
+	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+	.slice(0, 3);
+---
+
+<!doctype html>
+<html lang="it">
+	<head>
+		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<section class="hero">
+				<h1>{SITE_HERO}</h1>
+			</section>
+
+			<section class="intro">
+				<p>{BIO_EXCERPT}</p>
+				<p class="contact-line">
+					<a href={`mailto:${CONTACTS.email}`}>Email</a>
+					<a href={CONTACTS.github} target="_blank" rel="noopener noreferrer">GitHub</a>
+					<a href={CONTACTS.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a>
+					<a href="/about">Bio completa →</a>
+				</p>
+			</section>
+
+			<section class="block">
+				<div class="block-head">
+					<h2>Progetti in evidenza</h2>
+					<a href="/projects">Tutti i progetti →</a>
+				</div>
+				<ProjectList projects={featuredProjects} />
+			</section>
+
+			<section class="block">
+				<div class="block-head">
+					<h2>Ultimi articoli</h2>
+					<a href="/blog">Tutti gli articoli →</a>
+				</div>
+				{
+					latestPosts.length === 0 ? (
+						<p>Presto i primi articoli.</p>
+					) : (
+						<ul class="posts">
+							{latestPosts.map((post) => (
+								<li>
+									<a href={`/blog/${post.id}/`}>
+										<span class="post-title">{post.data.title}</span>
+										<FormattedDate date={post.data.pubDate} />
+									</a>
+								</li>
+							))}
+						</ul>
+					)
+				}
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.hero h1 {
+		font-size: 2.6em;
+		line-height: 1.15;
+		margin-bottom: 0.2em;
+	}
+	.intro {
+		margin-bottom: 2.5em;
+	}
+	.contact-line {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1.25em;
+	}
+	.block {
+		margin-bottom: 3em;
+	}
+	.block-head {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 1em;
+		margin-bottom: 1.25em;
+	}
+	.block-head h2 {
+		margin: 0;
+	}
+	.block-head a {
+		white-space: nowrap;
+		font-size: 0.95em;
+	}
+	.posts {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+	.posts li {
+		border-bottom: 1px solid rgb(var(--gray-light));
+	}
+	.posts li:first-child {
+		border-top: 1px solid rgb(var(--gray-light));
+	}
+	.posts a {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 0.5em;
+		padding: 0.85em 0.25em;
+		text-decoration: none;
+		color: rgb(var(--black));
+	}
+	.posts a:hover .post-title {
+		color: var(--accent);
+	}
+	.post-title {
+		font-size: 1.2em;
+	}
+	@media (max-width: 720px) {
+		.hero h1 {
+			font-size: 2em;
+		}
+	}
+</style>

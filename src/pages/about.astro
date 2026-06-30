@@ -1,0 +1,40 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_TITLE, BIO, CONTACTS } from '../consts';
+---
+
+<!doctype html>
+<html lang="it">
+	<head>
+		<BaseHead title={`About — ${SITE_TITLE}`} description="Chi sono: Stefano Ferri, tra vibrazioni e software." />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<h1>About</h1>
+			<p>{BIO}</p>
+
+			<h2>Contatti</h2>
+			<ul class="contacts">
+				<li><a href={CONTACTS.github} target="_blank" rel="noopener noreferrer">GitHub</a></li>
+				<li><a href={CONTACTS.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
+				<li><a href={`mailto:${CONTACTS.email}`}>{CONTACTS.email}</a></li>
+				<li><a href={CONTACTS.company} target="_blank" rel="noopener noreferrer">Vibrofer</a></li>
+			</ul>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.contacts {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+	.contacts li {
+		margin-bottom: 0.5em;
+	}
+</style>
