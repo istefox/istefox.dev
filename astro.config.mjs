@@ -6,7 +6,7 @@ import { defineConfig, fontProviders } from 'astro/config';
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://www.istefox.dev',
+	site: 'https://istefox.dev',
 	integrations: [mdx(), sitemap()],
 	fonts: [
 		{
