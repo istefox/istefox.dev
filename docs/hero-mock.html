@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CleanKey — hero GIF mock</title>
+<style>
+	/* Recording mock for hero-ai-coding-mode.gif. Not shipped (lives in docs/).
+	   Stage is a fixed 1280x800 (16:10) box; record just the stage.
+	   The menu-bar icon is faithful to the real app: SF-Symbol "keyboard" plus a
+	   quarter-sun from the bottom-right corner = keep-awake ON (MenuBarController.swift). */
+	* { box-sizing: border-box; margin: 0; padding: 0; }
+	html, body {
+		height: 100%;
+		background: #05070a;
+		font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+		overflow: hidden;
+	}
+	.viewport {
+		position: fixed;
+		inset: 0;
+		display: grid;
+		place-items: center;
+	}
+
+	/* ---- The Mac screen (record this) ---- */
+	.stage {
+		position: relative;
+		width: 1280px;
+		height: 800px;
+		transform-origin: center;
+		border-radius: 14px;
+		overflow: hidden;
+		box-shadow: 0 30px 90px rgba(0,0,0,.6);
+	}
+	/* Record mode (press R): square corners, no shadow, thin trace outline. */
+	body.rec { background: #000; }
+	body.rec .stage {
+		border-radius: 0;
+		box-shadow: 0 0 0 1px rgba(255,255,255,.35);
+	}
+	.desktop {
+		position: absolute;
+		inset: 0;
+		background:
+			radial-gradient(120% 90% at 20% 0%, #2b3a67 0%, transparent 55%),
+			radial-gradient(120% 100% at 100% 100%, #6d3b6b 0%, transparent 50%),
+			linear-gradient(160deg, #1a2036 0%, #0f1424 60%, #0a0f1e 100%);
+	}
+
+	/* ---- Menu bar ---- */
+	.menubar {
+		position: absolute;
+		top: 0; left: 0; right: 0;
+		height: 30px;
+		display: flex;
+		align-items: center;
+		gap: 18px;
+		padding: 0 14px;
+		background: rgba(20,22,30,.42);
+		backdrop-filter: blur(18px);
+		-webkit-backdrop-filter: blur(18px);
+		color: rgba(255,255,255,.9);
+		font-size: 13px;
+		z-index: 5;
+	}
+	.menubar .brand { font-weight: 700; }
+	.menubar .menus { display: flex; gap: 16px; opacity: .82; font-weight: 500; }
+	.menubar .spacer { flex: 1; }
+	.menubar .status { display: flex; align-items: center; gap: 14px; opacity: .9; }
+	.menubar .status .glyph { opacity: .8; }
+	.clock { font-variant-numeric: tabular-nums; }
+
+	/* ---- The real CleanKey icon (keyboard + quarter-sun) ---- */
+	.ck-icon { display: block; height: auto; }
+	.ck-icon .kb { color: currentColor; }
+	.ck-icon .moat { fill: var(--icon-bg, #14161e); stroke: var(--icon-bg, #14161e); }
+	.ck-icon .sun { fill: #fff; stroke: #fff; }
+	/* keep-awake ON = sun visible; it fades out as keep-awake releases (asleep). */
+	.awake-badge { transition: opacity .6s ease; }
+	.stage[data-phase="sleeping"] .awake-badge,
+	.stage[data-phase="black"] .awake-badge { opacity: 0; }
+
+	.ck-mini {
+		--icon-bg: #171922;
+		display: inline-flex;
+		align-items: center;
+		color: #fff;
+	}
+	.ck-mini .ck-icon { width: 23px; }
+
+	/* ---- Zoom inset: a faithful magnification of the real icon ---- */
+	.ck-zoom {
+		position: absolute;
+		top: 46px; right: 30px;
+		z-index: 6;
+	}
+	.ck-zoom::before {
+		content: "";
+		position: absolute;
+		top: -7px; right: 40px;
+		width: 14px; height: 14px;
+		background: #12141c;
+		border-left: 1px solid rgba(255,255,255,.12);
+		border-top: 1px solid rgba(255,255,255,.12);
+		transform: rotate(45deg);
+	}
+	.tile {
+		--icon-bg: #12141c;
+		position: relative;
+		width: 108px; height: 108px;
+		border-radius: 26px;
+		display: grid;
+		place-items: center;
+		color: #fff;
+		background: #12141c;
+		border: 1px solid rgba(255,255,255,.12);
+		box-shadow: 0 18px 50px rgba(0,0,0,.45);
+	}
+	.tile .ck-icon { width: 68px; }
+	/* soft attention pulse; stops once the Mac sleeps */
+	.tile::after {
+		content: "";
+		position: absolute;
+		inset: -6px;
+		border-radius: 30px;
+		border: 2px solid rgba(255,255,255,.22);
+		animation: pulse 2.6s ease-out infinite;
+	}
+	@keyframes pulse {
+		0% { transform: scale(.92); opacity: .5; }
+		70% { opacity: 0; }
+		100% { transform: scale(1.16); opacity: 0; }
+	}
+	.stage[data-phase="sleeping"] .tile::after,
+	.stage[data-phase="black"] .tile::after { animation: none; opacity: 0; }
+
+	/* ---- Claude Code window ---- */
+	.window {
+		position: absolute;
+		left: 190px; top: 120px;
+		width: 900px; height: 560px;
+		border-radius: 12px;
+		overflow: hidden;
+		background: #0d1117;
+		border: 1px solid rgba(255,255,255,.08);
+		box-shadow: 0 24px 70px rgba(0,0,0,.5);
+		z-index: 4;
+	}
+	.titlebar {
+		height: 40px;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 0 14px;
+		background: #161b22;
+		border-bottom: 1px solid rgba(255,255,255,.06);
+	}
+	.lights { display: flex; gap: 8px; }
+	.lights i { width: 12px; height: 12px; border-radius: 50%; display: block; }
+	.lights .r { background: #ff5f57; }
+	.lights .y { background: #febc2e; }
+	.lights .g { background: #28c840; }
+	.titlebar .name {
+		flex: 1;
+		text-align: center;
+		font-size: 13px;
+		color: #8b949e;
+		font-weight: 600;
+	}
+	.terminal {
+		height: calc(100% - 40px);
+		padding: 18px 20px;
+		font-family: ui-monospace, "SF Mono", Menlo, monospace;
+		font-size: 14px;
+		line-height: 1.7;
+		color: #c9d1d9;
+		overflow: hidden;
+	}
+	.terminal .row { opacity: 0; transform: translateY(6px); transition: opacity .25s ease, transform .25s ease; }
+	.terminal .row.show { opacity: 1; transform: none; }
+	.prompt { color: #7ee787; }
+	.tool   { color: #58a6ff; }
+	.dim    { color: #8b949e; }
+	.ok     { color: #3fb950; }
+	.done   { color: #d2a8ff; font-weight: 600; }
+	.cursor { display: inline-block; width: 8px; height: 16px; background: #c9d1d9; vertical-align: -2px; animation: blink 1s steps(1) infinite; }
+	@keyframes blink { 50% { opacity: 0; } }
+
+	/* ---- Idle badge (shown at "done") ---- */
+	.idle {
+		position: absolute;
+		left: 190px; top: 690px;
+		z-index: 6;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		font-size: 13px;
+		color: #e6edf3;
+		padding: 6px 12px;
+		border-radius: 999px;
+		background: rgba(12,14,20,.7);
+		border: 1px solid rgba(255,255,255,.12);
+		opacity: 0;
+		transform: translateY(6px);
+		transition: opacity .3s ease, transform .3s ease;
+	}
+	.stage[data-phase="done"] .idle,
+	.stage[data-phase="sleeping"] .idle { opacity: 1; transform: none; }
+	.idle .t { font-variant-numeric: tabular-nums; font-weight: 700; }
+
+	/* ---- Big caption ---- */
+	.caption {
+		position: absolute;
+		left: 44px; bottom: 40px;
+		z-index: 7;
+		font-size: 34px;
+		font-weight: 800;
+		letter-spacing: -.5px;
+		color: #fff;
+		text-shadow: 0 2px 20px rgba(0,0,0,.5);
+		max-width: 640px;
+	}
+
+	/* ---- Sleep overlay ---- */
+	.sleep {
+		position: absolute;
+		inset: 0;
+		z-index: 20;
+		background: #000;
+		display: grid;
+		place-items: center;
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 1.1s ease;
+	}
+	.stage[data-phase="black"] .sleep { opacity: 1; }
+	.zzz {
+		color: rgba(255,255,255,.85);
+		font-size: 26px;
+		font-weight: 700;
+		letter-spacing: 4px;
+		opacity: 0;
+		transform: translateY(8px);
+		transition: opacity .8s ease .4s, transform .8s ease .4s;
+	}
+	.stage[data-phase="black"] .zzz { opacity: 1; transform: none; }
+
+	/* ---- helper note (NOT inside stage: excluded from a stage-only recording) ---- */
+	.help {
+		position: fixed;
+		left: 50%; bottom: 12px;
+		transform: translateX(-50%);
+		z-index: 100;
+		font-size: 12px;
+		color: rgba(255,255,255,.55);
+		background: rgba(0,0,0,.4);
+		padding: 6px 12px;
+		border-radius: 999px;
+		font-family: ui-monospace, monospace;
+	}
+	.help.hidden { display: none; }
+</style>
+</head>
+<body>
+	<div class="viewport">
+		<div class="stage" id="stage" data-phase="working">
+			<div class="desktop"></div>
+
+			<div class="menubar">
+				<span class="brand">CleanKey</span>
+				<span class="menus"><span>File</span><span>Edit</span><span>View</span><span>Window</span></span>
+				<span class="spacer"></span>
+				<span class="status">
+					<span class="glyph">􀙇</span>
+					<span class="ck-mini" id="ck-mini" title="CleanKey — keep awake on"></span>
+					<span class="clock" id="clock">02:14</span>
+				</span>
+			</div>
+
+			<div class="ck-zoom" aria-hidden="true">
+				<div class="tile" id="ck-zoom"></div>
+			</div>
+
+			<div class="window">
+				<div class="titlebar">
+					<span class="lights"><i class="r"></i><i class="y"></i><i class="g"></i></span>
+					<span class="name">claude — long-running task</span>
+				</div>
+				<div class="terminal" id="term"></div>
+			</div>
+
+			<div class="idle">
+				<span>Agent idle · sleeping in</span>
+				<span class="t" id="idle-t">20:00</span>
+			</div>
+
+			<div class="caption" id="caption">Awake while it codes.</div>
+
+			<div class="sleep"><span class="zzz">Z Z Z</span></div>
+		</div>
+	</div>
+
+	<div class="help" id="help">stage <b id="size">1280×800</b> (16:10) · R = record frame · Space = restart · H = hide this</div>
+
+<script>
+	// Faithful CleanKey icon: keyboard glyph + quarter-sun from the bottom-right
+	// corner (the real keep-awake indicator). One source of truth, injected in both
+	// the menu bar and the zoom inset. The <g class="awake-badge"> is faded out on sleep.
+	const ICON = `
+	<svg viewBox="0 0 24 15" class="ck-icon" fill="none">
+		<g class="kb">
+			<rect x=".6" y=".6" width="22.8" height="13.8" rx="2.6" fill="none" stroke="currentColor" stroke-width="1.2"/>
+			<g fill="currentColor">
+				<rect x="3.2" y="3.4" width="2" height="2" rx=".5"/>
+				<rect x="6.4" y="3.4" width="2" height="2" rx=".5"/>
+				<rect x="9.6" y="3.4" width="2" height="2" rx=".5"/>
+				<rect x="12.8" y="3.4" width="2" height="2" rx=".5"/>
+				<rect x="16" y="3.4" width="2" height="2" rx=".5"/>
+				<rect x="19.2" y="3.4" width="1.6" height="2" rx=".5"/>
+				<rect x="3.2" y="6.5" width="2" height="2" rx=".5"/>
+				<rect x="6.4" y="6.5" width="2" height="2" rx=".5"/>
+				<rect x="9.6" y="6.5" width="2" height="2" rx=".5"/>
+				<rect x="12.8" y="6.5" width="2" height="2" rx=".5"/>
+				<rect x="16" y="6.5" width="2.8" height="2" rx=".5"/>
+				<rect x="6.4" y="9.6" width="8.4" height="2" rx=".8"/>
+			</g>
+		</g>
+		<g class="awake-badge">
+			<g class="moat" stroke-linecap="round">
+				<path d="M23.4,14.4 L18.6,14.4 A4.8 4.8 0 0 1 23.4,9.6 Z" stroke="none"/>
+				<g fill="none" stroke-width="2">
+					<path d="M23.4,9.4 L23.4,7.4"/>
+					<path d="M18.4,14.4 L16.4,14.4"/>
+					<path d="M20.9,10.07 L19.9,8.4"/>
+					<path d="M19.07,11.9 L17.4,10.9"/>
+				</g>
+			</g>
+			<g class="sun" stroke-linecap="round">
+				<path d="M23.4,14.4 L19.4,14.4 A4 4 0 0 1 23.4,10.4 Z" stroke="none"/>
+				<g fill="none" stroke-width="1">
+					<path d="M23.4,9.4 L23.4,7.6"/>
+					<path d="M18.4,14.4 L16.6,14.4"/>
+					<path d="M20.9,10.07 L20.0,8.51"/>
+					<path d="M19.07,11.9 L17.51,11.0"/>
+				</g>
+			</g>
+		</g>
+	</svg>`;
+	document.getElementById('ck-mini').innerHTML = ICON;
+	document.getElementById('ck-zoom').innerHTML = ICON;
+
+	const stage   = document.getElementById('stage');
+	const term    = document.getElementById('term');
+	const caption = document.getElementById('caption');
+	const idleT   = document.getElementById('idle-t');
+	const help    = document.getElementById('help');
+	const idleEl  = document.querySelector('.idle');
+	const sleepEl = document.querySelector('.sleep');
+	const zzzEl   = document.querySelector('.zzz');
+	const awakeBadges = document.querySelectorAll('.awake-badge');
+
+	// Fake, clean agent session (CleanKey internals — on brand).
+	const LINES = [
+		{ c: 'prompt', t: '> refactor the keep-awake engine to async/await and add tests' },
+		{ c: 'tool',   t: '● Read  KeepAwakeManager.swift' },
+		{ c: 'tool',   t: '● Edit  KeepAwakeManager.swift    +42 −18' },
+		{ c: 'tool',   t: '● Read  HeartbeatWatcher.swift' },
+		{ c: 'tool',   t: '● Edit  HeartbeatWatcher.swift     +9 −3' },
+		{ c: 'tool',   t: '● Run   xcodebuild test' },
+		{ c: 'ok',     t: '        ✓ 436 tests passed' },
+		{ c: 'tool',   t: '● Edit  EndOfSessionEngine.swift   +15 −6' },
+	];
+	const DONE = { c: 'done', t: '✓ Done · 3 files changed · 436 tests green' };
+
+	// Single timeline (ms). Both the live loop and the deterministic renderer use it.
+	const WORK_END = 250 + LINES.length * 260;          // 2330
+	const DONE_AT  = WORK_END + 200;                     // 2530 — "Done" line + idle countdown starts
+	const CURSOR_AT= WORK_END + 380;                     // 2710 — fresh prompt with cursor
+	const SLEEP_AT = WORK_END + 1500;                    // 3830 — keep-awake releases (sun fades)
+	const CAP_AT   = WORK_END + 2000;                    // 4330 — caption flips to "Asleep"
+	const BLACK_AT = WORK_END + 2200;                    // 4530 — screen fades to black
+	const CYCLE    = WORK_END + 4170;                    // 6500 — loop point (holds on black first)
+
+	// Rows and the time each becomes visible.
+	const SEQ = LINES.map((line, i) => ({ line, at: 250 + i * 260 }));
+	SEQ.push({ line: DONE, at: DONE_AT });
+	SEQ.push({ line: { c: 'prompt', t: '> ' }, cursor: true, at: CURSOR_AT });
+
+	const fmt = (n) => String(Math.floor(n / 60)).padStart(2, '0') + ':' + String(n % 60).padStart(2, '0');
+
+	// Pure state application for a given elapsed time — the renderer seeks with this.
+	function applyState(t) {
+		term.innerHTML = '';
+		for (const s of SEQ) {
+			if (t < s.at) continue;
+			const d = document.createElement('div');
+			d.className = 'row show ' + s.line.c;
+			d.innerHTML = s.line.t + (s.cursor ? ' <span class="cursor"></span>' : '');
+			term.appendChild(d);
+		}
+		const sun = t >= SLEEP_AT ? Math.max(0, 1 - (t - SLEEP_AT) / 600) : 1;
+		awakeBadges.forEach((b) => (b.style.opacity = sun));
+		caption.textContent = t >= CAP_AT ? 'Asleep when it’s done.' : 'Awake while it codes.';
+		const idleOn = t >= DONE_AT && t < BLACK_AT;
+		idleEl.style.opacity = idleOn ? 1 : 0;
+		idleEl.style.transform = 'none';
+		idleT.textContent = t >= DONE_AT ? fmt(Math.max(0, Math.round(1200 * (1 - (t - DONE_AT) / 2000)))) : '20:00';
+		sleepEl.style.opacity = t >= BLACK_AT ? Math.min(1, (t - BLACK_AT) / 1100) : 0;
+		const zzz = t >= BLACK_AT + 400 ? Math.min(1, (t - BLACK_AT - 400) / 800) : 0;
+		zzzEl.style.opacity = zzz;
+		zzzEl.style.transform = 'none';
+	}
+
+	const sizeEl = document.getElementById('size');
+	function fitScale() {
+		const s = Math.min(window.innerWidth / 1280, window.innerHeight / 800, 1);
+		stage.style.transform = `scale(${s})`;
+		if (sizeEl) sizeEl.textContent = Math.round(1280 * s) + '×' + Math.round(800 * s);
+	}
+
+	const params = new URLSearchParams(location.search);
+	if (params.get('render') === '1') {
+		// Deterministic render mode: no timers, no CSS transitions/animations. A headless
+		// browser sets window.seek(t) per frame and screenshots. Square corners, no chrome.
+		const off = document.createElement('style');
+		off.textContent = '*{transition:none!important;animation:none!important}';
+		document.head.appendChild(off);
+		help.style.display = 'none';
+		stage.style.transform = 'none';
+		stage.style.borderRadius = '0';
+		stage.style.boxShadow = 'none';
+		window.CYCLE = CYCLE;
+		window.seek = applyState;
+		applyState(0);
+		window.seekReady = true;
+	} else {
+		// Live loop for preview: drive applyState with rAF against a wall clock.
+		let start = null;
+		function frame(now) {
+			if (start === null) start = now;
+			applyState((now - start) % CYCLE);
+			requestAnimationFrame(frame);
+		}
+		fitScale();
+		window.addEventListener('resize', fitScale);
+		document.addEventListener('keydown', (e) => {
+			if (e.key.toLowerCase() === 'h') help.classList.toggle('hidden');
+			if (e.key.toLowerCase() === 'r') document.body.classList.toggle('rec');
+		});
+		requestAnimationFrame(frame);
+	}
+</script>
+</body>
+</html>

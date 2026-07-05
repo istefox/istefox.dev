@@ -1,0 +1,107 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import ThemeToggle from '../components/ThemeToggle.astro';
+
+interface Props {
+	title: string;
+	description: string;
+	productName: string;
+}
+
+const { title, description, productName } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={title} description={description} />
+		<slot name="head" />
+	</head>
+	<body>
+		<header class="product-header">
+			<a class="wordmark" href="/cleankey">{productName}</a>
+			<nav class="product-nav">
+				<a href="/">istefox.dev</a>
+				<a href="/cleankey#get" class="get">Get it</a>
+				<ThemeToggle />
+			</nav>
+		</header>
+		<main class="product-main">
+			<slot />
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<!-- Palette override, product pages only (istefox.dev stays blue): black + violet + wisteria. -->
+<style is:global>
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	}
+	:root {
+		--accent: #7c3aed;
+		--accent-2: #c4b5fd;
+	}
+	:root[data-theme='dark'] {
+		--accent: #a78bfa;
+		--accent-2: #d6c9ff;
+	}
+</style>
+
+<style>
+	.product-header {
+		position: sticky;
+		top: 0;
+		z-index: 10;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1em;
+		padding: 0.6em 1.25em;
+		background: rgb(var(--bg-elevated));
+		border-bottom: 1px solid rgb(var(--gray-light));
+	}
+	.wordmark {
+		font-weight: 700;
+		font-size: 1.1rem;
+		text-decoration: none;
+		color: rgb(var(--black));
+	}
+	.product-nav {
+		display: flex;
+		align-items: center;
+		gap: 1em;
+	}
+	.product-nav a {
+		text-decoration: none;
+		color: rgb(var(--gray-dark));
+	}
+	.product-nav a:hover {
+		color: var(--accent);
+	}
+	.product-nav .get {
+		padding: 0.35em 0.9em;
+		border: 1px solid var(--accent);
+		border-radius: 8px;
+		color: var(--accent);
+	}
+	.product-nav .get:hover {
+		background: var(--accent);
+		color: #fff;
+	}
+	/* Wider than the blog measure — this is a marketing page. */
+	.product-main {
+		width: 880px;
+		max-width: calc(100% - 2em);
+		margin: auto;
+		padding: 3em 1em 4em;
+	}
+	@media (max-width: 640px) {
+		.product-nav a:not(.get) {
+			display: none;
+		}
+	}
+</style>

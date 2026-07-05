@@ -25,8 +25,9 @@ export const projects: Project[] = [
 	},
 	{
 		name: 'CleanKey',
-		description: 'Piccola app desktop per macOS (Swift).',
-		url: 'https://github.com/istefox/CleanKey',
+		description:
+			'App menu-bar per macOS (Swift): blocca tastiera e trackpad per pulirli e tiene il Mac sveglio mentre il tuo agente AI programma.',
+		url: '/cleankey',
 		featured: true,
 	},
 	{

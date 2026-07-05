@@ -16,9 +16,13 @@ const HeadingTag = headingLevel;
 			<li class="project">
 				<HeadingTag class="project-name">
 					{project.url ? (
-						<a href={project.url} target="_blank" rel="noopener noreferrer">
-							{project.name}
-						</a>
+						project.url.startsWith('/') ? (
+							<a href={project.url}>{project.name}</a>
+						) : (
+							<a href={project.url} target="_blank" rel="noopener noreferrer">
+								{project.name}
+							</a>
+						)
 					) : (
 						<span>{project.name}</span>
 					)}
