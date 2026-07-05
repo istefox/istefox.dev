@@ -1,0 +1,167 @@
+---
+import ProductPage from '../../layouts/ProductPage.astro';
+import {
+	APPCAST_URL,
+	DMG_FALLBACK_URL,
+	DMG_FALLBACK_VERSION,
+	POLAR_CHECKOUT_URL,
+	PRO_PRICE,
+	GITHUB_URL,
+} from '../../data/cleankey';
+
+// Resolve the current DMG from the Sparkle appcast at build time so the download always matches the
+// latest signed release (same source that drives auto-updates). Fall back to a pinned URL if the
+// fetch or parse fails, so the page never ships a dead button.
+let dmgUrl = DMG_FALLBACK_URL;
+let version = DMG_FALLBACK_VERSION;
+try {
+	const res = await fetch(APPCAST_URL);
+	if (res.ok) {
+		const xml = await res.text();
+		const url = xml.match(/<enclosure[^>]*\burl="([^"]+\.dmg)"/i)?.[1];
+		const ver = xml.match(/<sparkle:shortVersionString>([^<]+)<\/sparkle:shortVersionString>/i)?.[1];
+		if (url) dmgUrl = url;
+		if (ver) version = ver.trim();
+	}
+} catch {
+	// keep the fallback
+}
+
+const hasPolar = POLAR_CHECKOUT_URL !== '';
+---
+
+<ProductPage
+	title={`Downloading CleanKey ${version}`}
+	description="Your CleanKey download is starting."
+	productName="CleanKey"
+>
+	<Fragment slot="head">
+		<meta name="robots" content="noindex" />
+	</Fragment>
+
+	<section class="dl">
+		<div class="spinner" aria-hidden="true"></div>
+		<h1>Your download is starting</h1>
+		<p class="lead">CleanKey {version} for macOS should begin downloading in a moment.</p>
+		<p class="fallback">
+			If it does not start,
+			<a id="dmg" href={dmgUrl} download>download CleanKey {version}</a>.
+		</p>
+
+		<ol class="steps">
+			<li>Open the DMG and drag CleanKey to your Applications folder.</li>
+			<li>Launch it from Applications. The icon appears in the menu bar.</li>
+			<li>On first run, grant Accessibility so the lock can block the keyboard and trackpad.</li>
+		</ol>
+
+		<p class="note">
+			The lock is free. A Pro license unlocks keep-awake, AI coding mode, and the end-of-session
+			automations.
+		</p>
+
+		<div class="cta-row">
+			{
+				hasPolar && (
+					<a class="btn btn-pro" href={POLAR_CHECKOUT_URL} data-polar-checkout data-polar-checkout-theme="dark">
+						Buy Pro{PRO_PRICE ? ` — ${PRO_PRICE}` : ''}
+					</a>
+				)
+			}
+			<a class="btn btn-ghost" href="/cleankey">Back to CleanKey</a>
+		</div>
+		<p class="muted"><a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">Source on GitHub</a></p>
+	</section>
+</ProductPage>
+
+<script is:inline define:vars={{ dmgUrl }}>
+	// Kick off the download shortly after paint. GitHub serves the DMG as an attachment, so the page
+	// stays put and the file downloads.
+	setTimeout(() => {
+		window.location.href = dmgUrl;
+	}, 1200);
+</script>
+
+<style>
+	.dl {
+		text-align: center;
+		max-width: 34rem;
+		margin: 2em auto;
+	}
+	.dl h1 {
+		font-size: 2.2em;
+		margin-bottom: 0.3em;
+	}
+	.lead {
+		font-size: 1.15em;
+		color: rgb(var(--gray-dark));
+	}
+	.fallback {
+		color: rgb(var(--gray));
+	}
+	.fallback a {
+		color: var(--accent);
+		font-weight: 600;
+	}
+	.spinner {
+		width: 40px;
+		height: 40px;
+		margin: 0 auto 1.2em;
+		border-radius: 50%;
+		border: 3px solid rgb(var(--gray-light));
+		border-top-color: var(--accent);
+		animation: spin 0.9s linear infinite;
+	}
+	@keyframes spin {
+		to { transform: rotate(360deg); }
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.spinner { animation: none; }
+	}
+	.steps {
+		text-align: left;
+		display: inline-block;
+		margin: 1.5em auto;
+		padding-left: 1.2em;
+		color: rgb(var(--gray-dark));
+	}
+	.steps li {
+		margin-bottom: 0.5em;
+	}
+	.note {
+		color: rgb(var(--gray));
+		font-size: 0.95em;
+	}
+	.cta-row {
+		display: flex;
+		gap: 0.75em;
+		justify-content: center;
+		flex-wrap: wrap;
+		margin: 1.4em 0 0.6em;
+	}
+	.btn {
+		display: inline-block;
+		padding: 0.7em 1.4em;
+		border-radius: 10px;
+		font-weight: 700;
+		text-decoration: none;
+		border: 1px solid transparent;
+	}
+	.btn-pro {
+		background: var(--accent);
+		color: #fff;
+	}
+	.btn-pro:hover {
+		filter: brightness(1.08);
+	}
+	.btn-ghost {
+		color: var(--accent);
+		border-color: rgb(var(--gray-light));
+	}
+	.btn-ghost:hover {
+		border-color: var(--accent);
+	}
+	.muted {
+		color: rgb(var(--gray));
+		font-size: 0.9em;
+	}
+</style>

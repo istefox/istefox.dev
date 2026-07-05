@@ -1,0 +1,775 @@
+---
+import { Image } from 'astro:assets';
+import ProductPage from '../layouts/ProductPage.astro';
+import {
+	HERO,
+	META_DESCRIPTION,
+	WHAT_IT_DOES,
+	FREE_VS_PRO,
+	AI_CODING_MODE,
+	AUTOMATIONS,
+	PRO_FEATURES,
+	COMPARISON_COLS,
+	COMPARISON_ROWS,
+	DIFFERENTIATORS,
+	WHO_FOR,
+	TRUST,
+	FAQ,
+	SHOT_LIST,
+	DOWNLOAD_URL,
+	GITHUB_URL,
+	POLAR_CHECKOUT_URL,
+	PRO_PRICE,
+} from '../data/cleankey';
+
+const hasPolar = POLAR_CHECKOUT_URL !== '';
+
+// Real screenshots live in src/assets/cleankey/. Match each SHOT_LIST entry by filename;
+// entries without a file fall back to a placeholder, so new captures appear by just dropping
+// the PNG in. import.meta.glob with eager gives the optimizable ImageMetadata for <Image>.
+const shotModules = import.meta.glob<{ default: ImageMetadata }>(
+	'../assets/cleankey/*.{png,jpg,jpeg,webp,gif}',
+	{ eager: true },
+);
+const shotImages: Record<string, ImageMetadata> = {};
+for (const [path, mod] of Object.entries(shotModules)) {
+	const name = path.split('/').pop();
+	if (name) shotImages[name] = mod.default;
+}
+
+// Minimal monoline icons (inline SVG, currentColor). No external assets, CSP-safe.
+const PATHS: Record<string, string> = {
+	bolt: '<path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/>',
+	columns: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 3v18"/>',
+	sparkles:
+		'<path d="M12 3l1.7 4.8L18.5 9l-4.8 1.7L12 15.5l-1.7-4.8L5.5 9l4.8-1.7z"/><path d="M19 14l.6 1.8 1.9.6-1.9.6-.6 1.9-.6-1.9-1.9-.6 1.9-.6z"/>',
+	loop: '<path d="M17 2l4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/>',
+	shield: '<path d="M12 3l7 3v5c0 4.5-3 7.6-7 9-4-1.4-7-4.5-7-9V6z"/>',
+	shieldCheck: '<path d="M12 3l7 3v5c0 4.5-3 7.6-7 9-4-1.4-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/>',
+	trophy: '<path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0z"/><path d="M7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3"/>',
+	users:
+		'<circle cx="9" cy="8" r="3"/><path d="M2.5 20c0-3.3 3-5 6.5-5s6.5 1.7 6.5 5"/><path d="M16 3.6a3 3 0 0 1 0 5.8M21.5 20c0-2.4-1.4-3.9-3.5-4.6"/>',
+	image: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M4 17l5-5 4 4 3-3 4 4"/>',
+	help: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.5 2.5 0 1 1 3.6 2.3c-.9.5-1.1.9-1.1 1.8"/><circle cx="12" cy="17" r=".7" fill="currentColor" stroke="none"/>',
+	download: '<path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 21h16"/>',
+	bell: '<path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M10.5 21a1.5 1.5 0 0 0 3 0"/>',
+	terminal: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3M13 15h4"/>',
+	lock: '<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',
+	moon: '<path d="M20 14a8 8 0 1 1-9-11 6 6 0 0 0 9 11z"/>',
+	check: '<path d="M4 12l5 5L20 6"/>',
+	cross: '<path d="M6 6l12 12M18 6L6 18"/>',
+};
+const icon = (name: string) =>
+	`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${PATHS[name] ?? ''}</svg>`;
+const ACTION_ICON: Record<string, string> = {
+	Notify: 'bell',
+	'Run Shortcut': 'terminal',
+	Lock: 'lock',
+	Sleep: 'moon',
+};
+
+// JSON-LD: free download always; Pro offer only when a price is set.
+const offers: Record<string, unknown>[] = [
+	{ '@type': 'Offer', name: 'Free', price: '0', priceCurrency: 'EUR' },
+];
+if (PRO_PRICE) {
+	offers.push({
+		'@type': 'Offer',
+		name: 'Pro',
+		price: PRO_PRICE.replace(/[^\d.]/g, ''),
+		priceCurrency: 'EUR',
+		url: POLAR_CHECKOUT_URL || undefined,
+	});
+}
+const jsonLd = {
+	'@context': 'https://schema.org',
+	'@type': 'SoftwareApplication',
+	name: 'CleanKey',
+	applicationCategory: 'UtilitiesApplication',
+	operatingSystem: 'macOS',
+	description: META_DESCRIPTION,
+	url: 'https://www.istefox.dev/cleankey',
+	offers,
+};
+---
+
+<ProductPage title="CleanKey — Keep your Mac awake while your AI codes" description={META_DESCRIPTION} productName="CleanKey">
+	<Fragment slot="head">
+		<meta property="og:type" content="product" />
+		<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+		{/* Polar embedded checkout. Pinned to an exact version with Subresource Integrity so a CDN
+		    compromise cannot inject code into the payment flow. To update: bump the version, then
+		    recompute the hash with
+		    `curl -s <url> | openssl dgst -sha384 -binary | openssl base64 -A`. */}
+		{hasPolar && (
+			<script
+				src="https://cdn.jsdelivr.net/npm/@polar-sh/checkout@0.1.15/dist/embed.global.js"
+				integrity="sha384-cahoDBb6jqcy/nI95rzv3Y/qHhTMk6K/P23HB8wK8Exw/CWv659cFJycoxNkEjEs"
+				crossorigin="anonymous"
+				defer
+				data-auto-init
+			></script>
+		)}
+	</Fragment>
+
+	<!-- Hero -->
+	<section class="hero">
+		<h1>{HERO.headline}</h1>
+		<p class="subhead">{HERO.subhead}</p>
+		<div class="cta-row">
+			<a class="btn btn-primary" href={DOWNLOAD_URL}>
+				<span class="btnico" set:html={icon('download')} />Download free
+			</a>
+			{
+				hasPolar ? (
+					<a class="btn btn-pro" href={POLAR_CHECKOUT_URL} data-polar-checkout data-polar-checkout-theme="dark">
+						Buy Pro{PRO_PRICE ? ` — ${PRO_PRICE}` : ''}
+					</a>
+				) : (
+					<span class="btn btn-disabled" aria-disabled="true">Pro — coming soon</span>
+				)
+			}
+		</div>
+		<p class="hero-note">macOS · notarized · free to download</p>
+		<figure class="shot shot-hero">
+			<video
+				class="hero-video"
+				autoplay
+				muted
+				loop
+				playsinline
+				preload="metadata"
+				poster="/cleankey/hero-ai-coding-mode-poster.jpg"
+				aria-label={SHOT_LIST[0].caption}
+			>
+				<source src="/cleankey/hero-ai-coding-mode.webm" type="video/webm" />
+				<source src="/cleankey/hero-ai-coding-mode.mp4" type="video/mp4" />
+			</video>
+			<figcaption>{SHOT_LIST[0].caption}</figcaption>
+		</figure>
+	</section>
+
+	<!-- What it does -->
+	<section class="block">
+		<h2><span class="h2ico" set:html={icon('bolt')} />What it does</h2>
+		{WHAT_IT_DOES.map((p) => <p>{p}</p>)}
+	</section>
+
+	<!-- Free vs Pro -->
+	<section class="block">
+		<h2><span class="h2ico" set:html={icon('columns')} />Free vs Pro</h2>
+		<table class="fvp">
+			<thead>
+				<tr><th>Feature</th><th>Free</th><th>Pro</th></tr>
+			</thead>
+			<tbody>
+				{
+					FREE_VS_PRO.map((r) => (
+						<tr>
+							<td>{r.feature}</td>
+							<td class={r.free ? 'yes' : 'no'}>{r.free ? '✓' : '—'}</td>
+							<td class={r.pro ? 'yes' : 'no'}>{r.pro ? '✓' : '—'}</td>
+						</tr>
+					))
+				}
+			</tbody>
+		</table>
+	</section>
+
+	<!-- AI coding mode (flagship) -->
+	<section class="block">
+		<h2><span class="h2ico" set:html={icon('sparkles')} />{AI_CODING_MODE.title}</h2>
+		{AI_CODING_MODE.body.map((p) => <p>{p}</p>)}
+		<div class="code-wrap">
+			<button id="copy-hook" class="copy-btn" type="button" data-copied="false">Copy hook setup</button>
+			<pre><code>{AI_CODING_MODE.hookJson}</code></pre>
+		</div>
+	</section>
+
+	<!-- End-of-session automations -->
+	<section class="block">
+		<h2><span class="h2ico" set:html={icon('loop')} />{AUTOMATIONS.title}</h2>
+		{AUTOMATIONS.body.map((p) => <p>{p}</p>)}
+		<h3 class="sub">Triggers</h3>
+		<ul class="trust">
+			{AUTOMATIONS.triggers.map((t) => <li>{t}</li>)}
+		</ul>
+		<h3 class="sub">Actions, in order</h3>
+		<div class="cards">
+			{
+				AUTOMATIONS.actions.map((a) => (
+					<div class="card">
+						<h3><span class="cardico" set:html={icon(ACTION_ICON[a.name] ?? 'sparkles')} />{a.name}</h3>
+						<p>{a.body}</p>
+					</div>
+				))
+			}
+		</div>
+		<p class="muted">{AUTOMATIONS.safety}</p>
+	</section>
+
+	<!-- Pro feature deep-dive -->
+	<section class="block">
+		<h2><span class="h2ico" set:html={icon('shield')} />More Pro guards</h2>
+		<div class="cards">
+			{
+				PRO_FEATURES.map((f) => (
+					<div class="card">
+						<h3>{f.title}</h3>
+						<p>{f.body}</p>
+					</div>
+				))
+			}
+		</div>
+	</section>
+
+	<!-- Comparison -->
+	<section class="block">
+		<h2><span class="h2ico" set:html={icon('trophy')} />CleanKey vs the alternatives</h2>
+		<p class="muted">Facts checked 2026-07; competitors change, so re-verify before relying on this.</p>
+		<table class="cmp">
+			<thead>
+				<tr><th></th>{COMPARISON_COLS.map((c, i) => <th class={i === 0 ? 'own' : ''}>{c}</th>)}</tr>
+			</thead>
+			<tbody>
+				{
+					COMPARISON_ROWS.map((row) => (
+						<tr>
+							<td class="row-label">{row.label}</td>
+							{row.values.map((v, i) => {
+								const yes = v.startsWith('Yes');
+								const no = v.startsWith('No');
+								const extra = v.replace(/^(Yes|No)\b\s*/, '');
+								return (
+									<td class={`${yes ? 'yes' : no ? 'no' : ''}${i === 0 ? ' own' : ''}`} data-label={COMPARISON_COLS[i]}>
+										{yes && <span class="ci ci-yes" set:html={icon('check')} />}
+										{no && <span class="ci ci-no" set:html={icon('cross')} />}
+										{yes || no ? extra && <span class="ci-txt">{extra}</span> : <span class="ci-txt">{v}</span>}
+									</td>
+								);
+							})}
+						</tr>
+					))
+				}
+			</tbody>
+		</table>
+		<ul class="diff">
+			{DIFFERENTIATORS.map((d) => <li>{d}</li>)}
+		</ul>
+	</section>
+
+	<!-- Who it's for -->
+	<section class="block">
+		<h2><span class="h2ico" set:html={icon('users')} />Who it’s for</h2>
+		<div class="cards">
+			{
+				WHO_FOR.map((w) => (
+					<div class="card">
+						<h3>{w.title}</h3>
+						<p>{w.body}</p>
+					</div>
+				))
+			}
+		</div>
+	</section>
+
+	<!-- Trust & safety -->
+	<section class="block">
+		<h2><span class="h2ico" set:html={icon('shieldCheck')} />Trust and safety</h2>
+		<ul class="trust">
+			{TRUST.map((t) => <li>{t}</li>)}
+		</ul>
+	</section>
+
+	<!-- Pricing / get it -->
+	<section class="block get-block" id="get">
+		<h2><span class="h2ico" set:html={icon('download')} />Get CleanKey</h2>
+		<p>The lock is free to download and use. Pro unlocks keep-awake and everything above with a license key, activated in the app and sold through Polar. Pay what you want, from €2.99, with a 14-day refund.</p>
+		<div class="cta-row">
+			<a class="btn btn-primary" href={DOWNLOAD_URL}><span class="btnico" set:html={icon('download')} />Download free</a>
+			{
+				hasPolar ? (
+					<a class="btn btn-pro" href={POLAR_CHECKOUT_URL} data-polar-checkout data-polar-checkout-theme="dark">
+						Buy Pro{PRO_PRICE ? ` — ${PRO_PRICE}` : ''}
+					</a>
+				) : (
+					<span class="btn btn-disabled" aria-disabled="true">Pro — coming soon</span>
+				)
+			}
+		</div>
+		<p class="muted"><a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">Source and releases on GitHub</a></p>
+	</section>
+
+	<!-- Screenshots -->
+	<section class="block">
+		<h2><span class="h2ico" set:html={icon('image')} />A look inside</h2>
+		<div class="gallery">
+			{
+				SHOT_LIST.slice(1).map((s) => {
+					const img = shotImages[s.key];
+					return (
+						<figure class="shot">
+							{
+								img ? (
+									<Image
+										class="shot-img"
+										src={img}
+										alt={s.title ?? s.caption}
+										widths={[375, 750]}
+										sizes="(min-width: 640px) 420px, 100vw"
+										loading="lazy"
+									/>
+								) : (
+									<div class="shot-placeholder">{s.key}</div>
+								)
+							}
+							{
+								s.title ? (
+									<figcaption class="shot-cap">
+										<span class="shot-title">{s.title}</span>
+										{s.desc && <span class="shot-desc">{s.desc}</span>}
+									</figcaption>
+								) : (
+									<figcaption>{s.caption}</figcaption>
+								)
+							}
+						</figure>
+					);
+				})
+			}
+		</div>
+	</section>
+
+	<!-- FAQ -->
+	<section class="block">
+		<h2><span class="h2ico" set:html={icon('help')} />FAQ</h2>
+		<div class="faq">
+			{
+				FAQ.map((item) => (
+					<details>
+						<summary>{item.q}</summary>
+						<p>{item.a}</p>
+					</details>
+				))
+			}
+		</div>
+	</section>
+</ProductPage>
+
+<script is:inline>
+	(() => {
+		const btn = document.getElementById('copy-hook');
+		if (!btn) return;
+		btn.addEventListener('click', async () => {
+			const code = btn.parentElement?.querySelector('code')?.textContent ?? '';
+			try {
+				await navigator.clipboard.writeText(code);
+				btn.textContent = 'Copied!';
+				setTimeout(() => (btn.textContent = 'Copy hook setup'), 1500);
+			} catch {
+				btn.textContent = 'Copy failed';
+				setTimeout(() => (btn.textContent = 'Copy hook setup'), 1500);
+			}
+		});
+	})();
+</script>
+
+<script is:inline>
+	(() => {
+		const v = document.querySelector('.hero-video');
+		if (v && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+			v.removeAttribute('autoplay');
+			v.pause();
+			v.currentTime = 0;
+		}
+	})();
+</script>
+
+<style>
+	.hero {
+		text-align: center;
+		padding: 1em 0 2em;
+	}
+	.hero h1 {
+		font-size: 2.8em;
+		line-height: 1.1;
+		margin-bottom: 0.3em;
+	}
+	.subhead {
+		font-size: 1.2em;
+		color: rgb(var(--gray-dark));
+		max-width: 40ch;
+		margin: 0 auto 1.4em;
+	}
+	.cta-row {
+		display: flex;
+		gap: 0.75em;
+		justify-content: center;
+		flex-wrap: wrap;
+	}
+	.btn {
+		display: inline-block;
+		padding: 0.7em 1.4em;
+		border-radius: 10px;
+		font-weight: 700;
+		text-decoration: none;
+		cursor: pointer;
+		border: 1px solid transparent;
+	}
+	.btn-primary {
+		background: linear-gradient(120deg, #17131f, var(--accent) 85%);
+		color: #fff;
+	}
+	.btn-primary:hover {
+		filter: brightness(1.12);
+	}
+	.btn-pro {
+		background: transparent;
+		color: var(--accent);
+		border-color: var(--accent);
+	}
+	.btn-pro:hover {
+		background: var(--accent);
+		color: #fff;
+	}
+	.btn-disabled {
+		background: transparent;
+		color: rgb(var(--gray));
+		border-color: rgb(var(--gray-light));
+		cursor: not-allowed;
+	}
+	.hero-note {
+		margin-top: 0.9em;
+		font-size: 0.9em;
+		color: rgb(var(--gray));
+	}
+	.block {
+		margin: 3em 0;
+	}
+	.block > h2 {
+		display: flex;
+		align-items: center;
+		gap: 0.4em;
+		margin-bottom: 0.5em;
+		padding-bottom: 0.25em;
+		border-bottom: 2px solid var(--accent-2);
+	}
+	.h2ico {
+		display: inline-flex;
+		color: var(--accent);
+		flex: none;
+	}
+	.cardico {
+		display: inline-flex;
+		vertical-align: -0.15em;
+		margin-right: 0.4em;
+		color: var(--accent);
+	}
+	.btnico {
+		display: inline-flex;
+		vertical-align: -0.18em;
+		margin-right: 0.4em;
+	}
+	h3.sub {
+		margin: 1.4em 0 0.5em;
+		font-size: 1.05rem;
+	}
+	.muted {
+		color: rgb(var(--gray));
+		font-size: 0.95em;
+	}
+
+	table {
+		border-collapse: collapse;
+		width: 100%;
+	}
+	.fvp td,
+	.fvp th,
+	.cmp td,
+	.cmp th {
+		border-bottom: 1px solid rgb(var(--gray-light));
+		padding: 0.55em 0.7em;
+		text-align: left;
+		vertical-align: top;
+	}
+	.fvp th:nth-child(2),
+	.fvp th:nth-child(3),
+	.fvp td:nth-child(2),
+	.fvp td:nth-child(3) {
+		text-align: center;
+		width: 4.5em;
+	}
+	.yes {
+		color: #1a9c5b;
+		font-weight: 700;
+	}
+	:root[data-theme='dark'] .yes {
+		color: #4bd08a;
+	}
+	.no {
+		color: rgb(var(--gray));
+	}
+	/* Comparison: fits any width, never scrolls. Stacks into cards on phones. */
+	.cmp {
+		table-layout: fixed;
+	}
+	.cmp th,
+	.cmp td {
+		padding: 0.5em 0.4em;
+		font-size: 0.92em;
+	}
+	.cmp th:first-child,
+	.cmp td:first-child {
+		width: 32%;
+	}
+	.cmp .row-label {
+		font-weight: 600;
+		font-size: 0.95em;
+	}
+	.cmp th:not(:first-child),
+	.cmp td:not(.row-label) {
+		text-align: center;
+	}
+	.cmp .own {
+		color: var(--accent);
+		font-weight: 700;
+	}
+	.ci-yes {
+		color: #1a9c5b;
+	}
+	:root[data-theme='dark'] .ci-yes {
+		color: #4bd08a;
+	}
+	.ci-no {
+		color: rgb(var(--gray));
+	}
+	.ci-txt {
+		display: block;
+		font-size: 0.82em;
+		line-height: 1.3;
+		color: rgb(var(--gray));
+	}
+	@media (max-width: 640px) {
+		.cmp,
+		.cmp tbody,
+		.cmp tr,
+		.cmp td {
+			display: block;
+			width: 100%;
+		}
+		.cmp thead {
+			display: none;
+		}
+		.cmp tr {
+			border: 1px solid rgb(var(--gray-light));
+			border-radius: 12px;
+			padding: 0.5em 0.85em;
+			margin-bottom: 1em;
+		}
+		.cmp td {
+			border: none;
+			padding: 0.3em 0;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 1em;
+			text-align: right;
+		}
+		.cmp td.row-label {
+			text-align: left;
+			font-size: 1.05em;
+			border-bottom: 1px solid rgb(var(--gray-light));
+			margin-bottom: 0.4em;
+			padding-bottom: 0.4em;
+		}
+		.cmp td:not(.row-label)::before {
+			content: attr(data-label);
+			color: rgb(var(--gray));
+			font-size: 0.9em;
+			text-align: left;
+		}
+		.ci-txt {
+			display: inline;
+		}
+	}
+
+	.code-wrap {
+		position: relative;
+	}
+	.code-wrap pre {
+		background: rgb(var(--gray-light));
+		font-size: 0.8em;
+		white-space: pre-wrap;
+		word-break: break-word;
+		overflow: visible;
+	}
+	.code-wrap pre code {
+		white-space: pre-wrap;
+	}
+	.copy-btn {
+		position: absolute;
+		top: 0.6em;
+		right: 0.6em;
+		padding: 0.35em 0.8em;
+		font-size: 0.85em;
+		border: 1px solid var(--accent);
+		border-radius: 8px;
+		background: rgb(var(--bg-elevated));
+		color: var(--accent);
+		cursor: pointer;
+	}
+
+	.cards {
+		display: grid;
+		gap: 1.25em;
+	}
+	@media (min-width: 640px) {
+		.cards {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+	.card {
+		padding: 1.1em 1.3em;
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: 12px;
+		background: rgb(var(--bg-elevated));
+		transition: border-color 0.15s ease, transform 0.15s ease;
+	}
+	.card:hover {
+		border-color: var(--accent);
+		transform: translateY(-2px);
+	}
+	.card h3 {
+		display: flex;
+		align-items: center;
+	}
+	.card h3 {
+		margin: 0 0 0.35em;
+		font-size: 1.15rem;
+	}
+	.card p {
+		margin: 0;
+		font-size: 0.98rem;
+		color: rgb(var(--gray-dark));
+	}
+
+	.diff,
+	.trust {
+		padding-left: 1.2em;
+	}
+	.diff li,
+	.trust li {
+		margin-bottom: 0.6em;
+	}
+
+	.get-block {
+		text-align: center;
+		padding: 2em 1em;
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: 16px;
+		background: rgb(var(--bg-elevated));
+	}
+	.get-block .cta-row {
+		margin: 1.2em 0 0.8em;
+	}
+
+	.gallery {
+		display: grid;
+		gap: 1.25em;
+	}
+	@media (min-width: 640px) {
+		.gallery {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+	.shot {
+		margin: 0;
+	}
+	.shot-placeholder {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		aspect-ratio: 16 / 10;
+		border: 1px dashed rgb(var(--gray));
+		border-radius: 12px;
+		color: rgb(var(--gray));
+		font-size: 0.85em;
+		text-align: center;
+		padding: 1em;
+		background: rgb(var(--gray-light));
+	}
+	.shot-hero .shot-placeholder {
+		max-width: 640px;
+		margin: 1.5em auto 0.5em;
+	}
+	.hero-video {
+		display: block;
+		width: 100%;
+		max-width: 640px;
+		margin: 1.5em auto 0.5em;
+		aspect-ratio: 16 / 10;
+		object-fit: cover;
+		border-radius: 12px;
+		border: 1px solid rgb(var(--gray-light));
+		background: #000;
+	}
+	.shot figcaption {
+		margin-top: 0.5em;
+		font-size: 0.9em;
+		color: rgb(var(--gray));
+		text-align: center;
+	}
+	.shot-img {
+		display: block;
+		width: 100%;
+		height: auto;
+		border-radius: 12px;
+		border: 1px solid rgb(var(--gray-light));
+		background: #0d1117;
+	}
+	.shot-cap {
+		display: block;
+		margin-top: 0.7em;
+		text-align: left;
+	}
+	.shot-title {
+		display: block;
+		font-weight: 700;
+		font-size: 1rem;
+		color: rgb(var(--black));
+	}
+	.shot-desc {
+		display: block;
+		margin-top: 0.2em;
+		font-size: 0.9em;
+		line-height: 1.45;
+		color: rgb(var(--gray-dark));
+	}
+
+	.faq details {
+		border-bottom: 1px solid rgb(var(--gray-light));
+		padding: 0.75em 0;
+	}
+	.faq summary {
+		cursor: pointer;
+		font-weight: 600;
+	}
+	.faq details p {
+		margin: 0.6em 0 0;
+		color: rgb(var(--gray-dark));
+	}
+
+	@media (max-width: 640px) {
+		.hero h1 {
+			font-size: 2.1em;
+		}
+	}
+</style>
+
+<style is:global>
+	/* Icons are injected via set:html, so their <svg> has no scope hash; size them globally. */
+	.h2ico svg { width: 1.05em; height: 1.05em; }
+	.cardico svg { width: 1.15em; height: 1.15em; vertical-align: -0.15em; }
+	.btnico svg { width: 1.05em; height: 1.05em; vertical-align: -0.15em; }
+	.ci svg { width: 1.3em; height: 1.3em; vertical-align: -0.25em; }
+</style>

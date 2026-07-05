@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>CleanKey menu-bar states</title>
+<style>
+	* { box-sizing: border-box; margin: 0; padding: 0; }
+	html, body { background: transparent; font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif; }
+	.card {
+		display: inline-flex;
+		gap: 34px;
+		padding: 40px 46px;
+		background: #12141c;
+		border: 1px solid rgba(255,255,255,.12);
+		border-radius: 22px;
+	}
+	.state { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+	.chip {
+		width: 108px; height: 78px;
+		display: grid; place-items: center;
+		background: #1b1e27;
+		border-radius: 16px;
+		color: #fff;
+	}
+	.chip svg { width: 62px; height: auto; }
+	.label { font-size: 19px; font-weight: 600; color: #c9d2de; }
+	.sub   { font-size: 15px; color: #7d8794; margin-top: -8px; }
+</style>
+</head>
+<body>
+	<div class="card" id="card">
+		<div class="state"><div class="chip" data-state="off"></div><div class="label">Off</div></div>
+		<div class="state"><div class="chip" data-state="awake"></div><div class="label">Keeping awake</div></div>
+		<div class="state"><div class="chip" data-state="alert"></div><div class="label">Alert</div></div>
+	</div>
+<script>
+	// Faithful CleanKey menu-bar icon (keyboard + quarter-sun + optional red alert badge),
+	// same geometry as MenuBarController.swift. Rendered crisp instead of upscaling the
+	// tiny real captures.
+	const KB = `
+		<rect x=".6" y=".6" width="22.8" height="13.8" rx="2.6" fill="none" stroke="#fff" stroke-width="1.2"/>
+		<g fill="#fff">
+			<rect x="3.2" y="3.4" width="2" height="2" rx=".5"/><rect x="6.4" y="3.4" width="2" height="2" rx=".5"/>
+			<rect x="9.6" y="3.4" width="2" height="2" rx=".5"/><rect x="12.8" y="3.4" width="2" height="2" rx=".5"/>
+			<rect x="16" y="3.4" width="2" height="2" rx=".5"/><rect x="19.2" y="3.4" width="1.6" height="2" rx=".5"/>
+			<rect x="3.2" y="6.5" width="2" height="2" rx=".5"/><rect x="6.4" y="6.5" width="2" height="2" rx=".5"/>
+			<rect x="9.6" y="6.5" width="2" height="2" rx=".5"/><rect x="12.8" y="6.5" width="2" height="2" rx=".5"/>
+			<rect x="16" y="6.5" width="2.8" height="2" rx=".5"/>
+			<rect x="6.4" y="9.6" width="8.4" height="2" rx=".8"/>
+		</g>`;
+	// dark moat (chip colour) then white sun — separates the sun from the keyboard like the app.
+	const SUN = `
+		<g fill="#1b1e27" stroke="#1b1e27" stroke-linecap="round">
+			<path d="M23.4,14.4 L18.6,14.4 A4.8 4.8 0 0 1 23.4,9.6 Z" stroke="none"/>
+			<g fill="none" stroke-width="2">
+				<path d="M23.4,9.4 L23.4,7.4"/><path d="M18.4,14.4 L16.4,14.4"/>
+				<path d="M20.9,10.07 L19.9,8.4"/><path d="M19.07,11.9 L17.4,10.9"/>
+			</g>
+		</g>
+		<g fill="#fff" stroke="#fff" stroke-linecap="round">
+			<path d="M23.4,14.4 L19.4,14.4 A4 4 0 0 1 23.4,10.4 Z" stroke="none"/>
+			<g fill="none" stroke-width="1">
+				<path d="M23.4,9.4 L23.4,7.6"/><path d="M18.4,14.4 L16.6,14.4"/>
+				<path d="M20.9,10.07 L20.0,8.51"/><path d="M19.07,11.9 L17.51,11.0"/>
+			</g>
+		</g>`;
+	// red count badge, top-left (non-template in the app).
+	const BADGE = `
+		<circle cx="2.9" cy="2.9" r="3.7" fill="#1b1e27"/>
+		<circle cx="2.9" cy="2.9" r="2.9" fill="#ff453a"/>
+		<text x="2.9" y="4.35" font-size="4.2" font-weight="700" fill="#fff" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif">1</text>`;
+	const icon = (parts) => `<svg viewBox="0 0 24 15">${KB}${parts}</svg>`;
+	const states = { off: icon(''), awake: icon(SUN), alert: icon(SUN + BADGE) };
+	document.querySelectorAll('.chip').forEach((c) => (c.innerHTML = states[c.dataset.state]));
+	window.ready = true;
+</script>
+</body>
+</html>
