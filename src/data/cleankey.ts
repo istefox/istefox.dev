@@ -190,7 +190,7 @@ export const FAQ: FaqItem[] = [
 	{ q: 'How much does Pro cost?', a: 'Pay what you want, from €2.99, with €4.99 suggested. One payment, not a subscription, and the license is yours to keep.' },
 	{ q: 'Can I get a refund?', a: 'Yes. If Pro is not for you, ask within 14 days and you get a full refund.' },
 	{ q: 'Is it a subscription?', a: 'No. You pay once, keep the license, and updates arrive in the app.' },
-	{ q: 'How do I get help?', a: 'Email stefferri@icloud.com or open an issue on GitHub, and I will get back to you.' },
+	{ q: 'How do I get help?', a: 'Email stefferri@icloud.com and I will get back to you.' },
 ];
 
 export const SHOT_LIST: Shot[] = [
@@ -248,10 +248,9 @@ export const SHOT_LIST: Shot[] = [
 
 // Distribution + purchase.
 // The "Download free" CTA points at the in-site download page, which resolves the current DMG from
-// the Sparkle appcast at build time (see src/pages/cleankey/download.astro). GITHUB_URL is the code
-// repo; the signed DMGs live in the separate istefox/CleanKey-releases repo.
+// the Sparkle appcast at build time (see src/pages/cleankey/download.astro). No source-repo link is
+// exposed: the CleanKey code repo is private, only the signed DMG is distributed.
 export const DOWNLOAD_URL = '/cleankey/download';
-export const GITHUB_URL = 'https://github.com/istefox/CleanKey';
 
 // Sparkle appcast feeding the download page. APPCAST_URL is fetched at build; DMG_FALLBACK_URL is
 // used only if that fetch fails.
