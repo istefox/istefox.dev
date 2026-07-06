@@ -1,0 +1,122 @@
+---
+// The CleanKey call-to-action pair (Download free + Buy Pro), shared by the landing hero,
+// the pricing block, and the download page so the offer copy can never drift apart.
+import { DOWNLOAD_URL, POLAR_CHECKOUT_URL, PRO_PRICE } from '../../data/cleankey';
+
+interface Props {
+	showDownload?: boolean;
+	/** 'solid' promotes Buy Pro to the primary treatment (used where Download is absent). */
+	proVariant?: 'outline' | 'solid';
+	/** Optional reassurance line under the buttons, e.g. the pay-once note. */
+	note?: string;
+}
+
+const { showDownload = true, proVariant = 'outline', note } = Astro.props;
+const hasPolar = POLAR_CHECKOUT_URL !== '';
+---
+
+<div class="cta-row">
+	{
+		showDownload && (
+			<a class="btn btn-primary" href={DOWNLOAD_URL}>
+				<svg
+					class="btnico"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="1.75"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					aria-hidden="true"
+				>
+					<path d="M12 3v12M7 10l5 5 5-5" />
+					<path d="M4 21h16" />
+				</svg>
+				Download free
+			</a>
+		)
+	}
+	{
+		hasPolar ? (
+			<a
+				class:list={['btn', proVariant === 'solid' ? 'btn-pro-solid' : 'btn-pro']}
+				href={POLAR_CHECKOUT_URL}
+				data-polar-checkout
+				data-polar-checkout-theme="dark"
+			>
+				Buy Pro{PRO_PRICE ? ` — ${PRO_PRICE}` : ''}
+			</a>
+		) : (
+			<span class="btn btn-disabled" aria-disabled="true">
+				Pro — coming soon
+			</span>
+		)
+	}
+	<slot />
+</div>
+{note && <p class="cta-note">{note}</p>}
+
+<style>
+	.cta-row {
+		display: flex;
+		gap: 0.75em;
+		justify-content: center;
+		flex-wrap: wrap;
+	}
+	/* :where() keeps the slotted-button fallback at base specificity so variant
+	   classes (.btn-pro, .btn-ghost from the page) can still override it. */
+	.btn,
+	.cta-row :global(:where(.btn)) {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.45em;
+		padding: 0.7em 1.4em;
+		border-radius: 10px;
+		font-weight: 700;
+		text-decoration: none;
+		cursor: pointer;
+		border: 1px solid transparent;
+		transition: filter 0.15s ease, background-color 0.15s ease, color 0.15s ease,
+			border-color 0.15s ease;
+	}
+	.btnico {
+		width: 1.05em;
+		height: 1.05em;
+		flex: none;
+	}
+	.btn-primary {
+		background: linear-gradient(120deg, #17131f, var(--accent) 85%);
+		color: #fff;
+	}
+	.btn-primary:hover {
+		filter: brightness(1.12);
+	}
+	.btn-pro {
+		background: transparent;
+		color: var(--accent);
+		border-color: var(--accent);
+	}
+	.btn-pro:hover {
+		background: var(--accent);
+		color: #fff;
+	}
+	.btn-pro-solid {
+		background: var(--accent);
+		color: #fff;
+	}
+	.btn-pro-solid:hover {
+		filter: brightness(1.08);
+	}
+	.btn-disabled {
+		background: transparent;
+		color: rgb(var(--gray));
+		border-color: rgb(var(--gray-light));
+		cursor: not-allowed;
+	}
+	.cta-note {
+		margin: 0.8em 0 0;
+		text-align: center;
+		font-size: 0.9em;
+		color: rgb(var(--gray-dark));
+	}
+</style>

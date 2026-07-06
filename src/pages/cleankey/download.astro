@@ -1,32 +1,11 @@
 ---
 import ProductPage from '../../layouts/ProductPage.astro';
-import {
-	APPCAST_URL,
-	DMG_FALLBACK_URL,
-	DMG_FALLBACK_VERSION,
-	POLAR_CHECKOUT_URL,
-	PRO_PRICE,
-} from '../../data/cleankey';
+import CtaRow from '../../components/cleankey/CtaRow.astro';
+import { resolveAppcast } from '../../data/appcast';
 
-// Resolve the current DMG from the Sparkle appcast at build time so the download always matches the
-// latest signed release (same source that drives auto-updates). Fall back to a pinned URL if the
-// fetch or parse fails, so the page never ships a dead button.
-let dmgUrl = DMG_FALLBACK_URL;
-let version = DMG_FALLBACK_VERSION;
-try {
-	const res = await fetch(APPCAST_URL);
-	if (res.ok) {
-		const xml = await res.text();
-		const url = xml.match(/<enclosure[^>]*\burl="([^"]+\.dmg)"/i)?.[1];
-		const ver = xml.match(/<sparkle:shortVersionString>([^<]+)<\/sparkle:shortVersionString>/i)?.[1];
-		if (url) dmgUrl = url;
-		if (ver) version = ver.trim();
-	}
-} catch {
-	// keep the fallback
-}
-
-const hasPolar = POLAR_CHECKOUT_URL !== '';
+// Current DMG + version resolved from the Sparkle appcast at build time (shared resolver,
+// see src/data/appcast.ts), so the download always matches the latest signed release.
+const { dmgUrl, version } = await resolveAppcast();
 ---
 
 <ProductPage
@@ -43,8 +22,7 @@ const hasPolar = POLAR_CHECKOUT_URL !== '';
 		<h1>Your download is starting</h1>
 		<p class="lead">CleanKey {version} for macOS should begin downloading in a moment.</p>
 		<p class="fallback">
-			If it does not start,
-			<a id="dmg" href={dmgUrl} download>download CleanKey {version}</a>.
+			If it does not start, <a id="dmg" href={dmgUrl} download>download CleanKey {version}</a>.
 		</p>
 
 		<ol class="steps">
@@ -58,16 +36,9 @@ const hasPolar = POLAR_CHECKOUT_URL !== '';
 			automations.
 		</p>
 
-		<div class="cta-row">
-			{
-				hasPolar && (
-					<a class="btn btn-pro" href={POLAR_CHECKOUT_URL} data-polar-checkout data-polar-checkout-theme="dark">
-						Buy Pro{PRO_PRICE ? ` — ${PRO_PRICE}` : ''}
-					</a>
-				)
-			}
+		<CtaRow showDownload={false} proVariant="solid">
 			<a class="btn btn-ghost" href="/cleankey">Back to CleanKey</a>
-		</div>
+		</CtaRow>
 	</section>
 </ProductPage>
 
@@ -94,7 +65,7 @@ const hasPolar = POLAR_CHECKOUT_URL !== '';
 		color: rgb(var(--gray-dark));
 	}
 	.fallback {
-		color: rgb(var(--gray));
+		color: rgb(var(--gray-dark));
 	}
 	.fallback a {
 		color: var(--accent);
@@ -126,30 +97,11 @@ const hasPolar = POLAR_CHECKOUT_URL !== '';
 		margin-bottom: 0.5em;
 	}
 	.note {
-		color: rgb(var(--gray));
+		color: rgb(var(--gray-dark));
 		font-size: 0.95em;
 	}
-	.cta-row {
-		display: flex;
-		gap: 0.75em;
-		justify-content: center;
-		flex-wrap: wrap;
+	.dl :global(.cta-row) {
 		margin: 1.4em 0 0.6em;
-	}
-	.btn {
-		display: inline-block;
-		padding: 0.7em 1.4em;
-		border-radius: 10px;
-		font-weight: 700;
-		text-decoration: none;
-		border: 1px solid transparent;
-	}
-	.btn-pro {
-		background: var(--accent);
-		color: #fff;
-	}
-	.btn-pro:hover {
-		filter: brightness(1.08);
 	}
 	.btn-ghost {
 		color: var(--accent);
@@ -157,9 +109,5 @@ const hasPolar = POLAR_CHECKOUT_URL !== '';
 	}
 	.btn-ghost:hover {
 		border-color: var(--accent);
-	}
-	.muted {
-		color: rgb(var(--gray));
-		font-size: 0.9em;
 	}
 </style>

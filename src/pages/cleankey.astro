@@ -1,6 +1,9 @@
 ---
 import { Image } from 'astro:assets';
 import ProductPage from '../layouts/ProductPage.astro';
+import CtaRow from '../components/cleankey/CtaRow.astro';
+import { resolveAppcast } from '../data/appcast';
+import ogImage from '../assets/cleankey/og.png';
 import {
 	HERO,
 	META_DESCRIPTION,
@@ -16,12 +19,13 @@ import {
 	TRUST,
 	FAQ,
 	SHOT_LIST,
-	DOWNLOAD_URL,
 	POLAR_CHECKOUT_URL,
 	PRO_PRICE,
 } from '../data/cleankey';
 
 const hasPolar = POLAR_CHECKOUT_URL !== '';
+const { version } = await resolveAppcast();
+const chips = [`v${version} · macOS, notarized`, ...HERO.chips.slice(1)];
 
 // Real screenshots live in src/assets/cleankey/. Match each SHOT_LIST entry by filename;
 // entries without a file fall back to a placeholder, so new captures appear by just dropping
@@ -57,6 +61,11 @@ const PATHS: Record<string, string> = {
 	moon: '<path d="M20 14a8 8 0 1 1-9-11 6 6 0 0 0 9 11z"/>',
 	check: '<path d="M4 12l5 5L20 6"/>',
 	cross: '<path d="M6 6l12 12M18 6L6 18"/>',
+	flame: '<path d="M12 2s5 4.6 5 9.5a5 5 0 0 1-10 0C7 8.7 9 6.6 9 4.5c1 .8 1.7 1.8 2 3C11.6 5.7 12 4 12 2z"/>',
+	battery: '<rect x="2" y="8" width="17" height="8" rx="2"/><path d="M22 11v2M6 11v2M10 11v2"/>',
+	laptop: '<rect x="4" y="5" width="16" height="10" rx="1.5"/><path d="M2 19h20"/>',
+	calendar: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/>',
+	keyboard: '<rect x="2" y="7" width="20" height="10" rx="2"/><path d="M6 11h.01M10 11h.01M14 11h.01M18 11h.01M7 14h10"/>',
 };
 const icon = (name: string) =>
 	`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${PATHS[name] ?? ''}</svg>`;
@@ -66,10 +75,31 @@ const ACTION_ICON: Record<string, string> = {
 	Lock: 'lock',
 	Sleep: 'moon',
 };
+const PRO_ICON: Record<string, string> = {
+	'Keep Awake': 'bolt',
+	'Thermal protection': 'flame',
+	'Battery guards': 'battery',
+	'Clamshell keep-awake': 'laptop',
+	Schedule: 'calendar',
+};
+const WHO_ICON: Record<string, string> = {
+	'The vibe coder': 'sparkles',
+	'The clamshell power user': 'laptop',
+	'Everyone with a dirty keyboard': 'keyboard',
+};
+
+const SITE = Astro.site ?? new URL('https://istefox.dev');
+const ogImageURL = new URL(ogImage.src, SITE).toString();
 
 // JSON-LD: free download always; Pro offer only when a price is set.
 const offers: Record<string, unknown>[] = [
-	{ '@type': 'Offer', name: 'Free', price: '0', priceCurrency: 'EUR' },
+	{
+		'@type': 'Offer',
+		name: 'Free',
+		price: '0',
+		priceCurrency: 'EUR',
+		url: new URL('/cleankey/download', SITE).toString(),
+	},
 ];
 if (PRO_PRICE) {
 	offers.push({
@@ -80,22 +110,56 @@ if (PRO_PRICE) {
 		url: POLAR_CHECKOUT_URL || undefined,
 	});
 }
-const jsonLd = {
+const appLd = {
 	'@context': 'https://schema.org',
 	'@type': 'SoftwareApplication',
 	name: 'CleanKey',
 	applicationCategory: 'UtilitiesApplication',
 	operatingSystem: 'macOS',
 	description: META_DESCRIPTION,
-	url: 'https://istefox.dev/cleankey',
+	url: new URL('/cleankey', SITE).toString(),
+	image: ogImageURL,
+	screenshot: SHOT_LIST.slice(1).flatMap((s) => {
+		const img = shotImages[s.key];
+		return img ? [new URL(img.src, SITE).toString()] : [];
+	}),
+	softwareVersion: version,
+	downloadUrl: new URL('/cleankey/download', SITE).toString(),
+	author: { '@type': 'Person', name: 'Stefano Ferri', url: SITE.toString() },
 	offers,
+};
+// FAQ rich results, generated from the same FAQ array that renders the page section.
+const faqLd = {
+	'@context': 'https://schema.org',
+	'@type': 'FAQPage',
+	mainEntity: FAQ.map((f) => ({
+		'@type': 'Question',
+		name: f.q,
+		acceptedAnswer: { '@type': 'Answer', text: f.a },
+	})),
+};
+const breadcrumbLd = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: [
+		{ '@type': 'ListItem', position: 1, name: 'istefox.dev', item: SITE.toString() },
+		{ '@type': 'ListItem', position: 2, name: 'CleanKey', item: new URL('/cleankey', SITE).toString() },
+	],
 };
 ---
 
-<ProductPage title="CleanKey — Keep your Mac awake while your AI codes" description={META_DESCRIPTION} productName="CleanKey">
+<ProductPage
+	title="CleanKey for macOS — Keep your Mac awake while your AI codes"
+	description={META_DESCRIPTION}
+	productName="CleanKey"
+	image={ogImage}
+	imageAlt="CleanKey for macOS — awake while it codes, asleep when it’s done"
+>
 	<Fragment slot="head">
-		<meta property="og:type" content="product" />
-		<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+		<link rel="preload" as="image" href="/cleankey/hero-ai-coding-mode-poster.jpg" fetchpriority="high" />
+		<script type="application/ld+json" set:html={JSON.stringify(appLd)} />
+		<script type="application/ld+json" set:html={JSON.stringify(faqLd)} />
+		<script type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
 		{/* Polar embedded checkout. Pinned to an exact version with Subresource Integrity so a CDN
 		    compromise cannot inject code into the payment flow. To update: bump the version, then
 		    recompute the hash with
@@ -115,42 +179,37 @@ const jsonLd = {
 	<section class="hero">
 		<h1>{HERO.headline}</h1>
 		<p class="subhead">{HERO.subhead}</p>
-		<div class="cta-row">
-			<a class="btn btn-primary" href={DOWNLOAD_URL}>
-				<span class="btnico" set:html={icon('download')} />Download free
-			</a>
-			{
-				hasPolar ? (
-					<a class="btn btn-pro" href={POLAR_CHECKOUT_URL} data-polar-checkout data-polar-checkout-theme="dark">
-						Buy Pro{PRO_PRICE ? ` — ${PRO_PRICE}` : ''}
-					</a>
-				) : (
-					<span class="btn btn-disabled" aria-disabled="true">Pro — coming soon</span>
-				)
-			}
-		</div>
-		<p class="hero-note">macOS · notarized · free to download</p>
+		<CtaRow />
+		<ul class="chips" role="list">
+			{chips.map((c) => <li>{c}</li>)}
+		</ul>
 		<figure class="shot shot-hero">
-			<video
-				class="hero-video"
-				autoplay
-				muted
-				loop
-				playsinline
-				preload="metadata"
-				poster="/cleankey/hero-ai-coding-mode-poster.jpg"
-				aria-label={SHOT_LIST[0].caption}
-			>
-				<source src="/cleankey/hero-ai-coding-mode.webm" type="video/webm" />
-				<source src="/cleankey/hero-ai-coding-mode.mp4" type="video/mp4" />
-			</video>
+			<div class="video-wrap">
+				<video
+					class="hero-video"
+					autoplay
+					muted
+					loop
+					playsinline
+					preload="metadata"
+					poster="/cleankey/hero-ai-coding-mode-poster.jpg"
+					aria-label={SHOT_LIST[0].caption}
+				>
+					<source src="/cleankey/hero-ai-coding-mode.webm" type="video/webm" />
+					<source src="/cleankey/hero-ai-coding-mode.mp4" type="video/mp4" />
+				</video>
+				<button id="video-toggle" class="video-toggle" type="button" data-state="playing" aria-label="Pause video">
+					<svg class="ic-pause" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 5v14M15 5v14" /></svg>
+					<svg class="ic-play" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><path d="M8 5l12 7-12 7z" /></svg>
+				</button>
+			</div>
 			<figcaption>{SHOT_LIST[0].caption}</figcaption>
 		</figure>
 	</section>
 
 	<!-- What it does -->
 	<section class="block">
-		<h2><span class="h2ico" set:html={icon('bolt')} />What it does</h2>
+		<h2><span class="h2ico" set:html={icon('bolt')} />Lock your keyboard for cleaning. Keep your Mac awake.</h2>
 		{WHAT_IT_DOES.map((p) => <p>{p}</p>)}
 	</section>
 
@@ -158,16 +217,31 @@ const jsonLd = {
 	<section class="block">
 		<h2><span class="h2ico" set:html={icon('columns')} />Free vs Pro</h2>
 		<table class="fvp">
+			<caption class="sr-only">CleanKey features included in the Free and Pro tiers</caption>
 			<thead>
-				<tr><th>Feature</th><th>Free</th><th>Pro</th></tr>
+				<tr><th scope="col">Feature</th><th scope="col">Free</th><th scope="col">Pro</th></tr>
 			</thead>
 			<tbody>
 				{
 					FREE_VS_PRO.map((r) => (
 						<tr>
-							<td>{r.feature}</td>
-							<td class={r.free ? 'yes' : 'no'}>{r.free ? '✓' : '—'}</td>
-							<td class={r.pro ? 'yes' : 'no'}>{r.pro ? '✓' : '—'}</td>
+							<th scope="row">{r.feature}</th>
+							<td class={r.free ? 'yes' : 'no'}>
+								{r.free ? (
+									<span class="ci ci-yes" set:html={icon('check')} />
+								) : (
+									<span aria-hidden="true">—</span>
+								)}
+								<span class="sr-only">{r.free ? 'Included' : 'Not included'}</span>
+							</td>
+							<td class={r.pro ? 'yes' : 'no'}>
+								{r.pro ? (
+									<span class="ci ci-yes" set:html={icon('check')} />
+								) : (
+									<span aria-hidden="true">—</span>
+								)}
+								<span class="sr-only">{r.pro ? 'Included' : 'Not included'}</span>
+							</td>
 						</tr>
 					))
 				}
@@ -180,7 +254,8 @@ const jsonLd = {
 		<h2><span class="h2ico" set:html={icon('sparkles')} />{AI_CODING_MODE.title}</h2>
 		{AI_CODING_MODE.body.map((p) => <p>{p}</p>)}
 		<div class="code-wrap">
-			<button id="copy-hook" class="copy-btn" type="button" data-copied="false">Copy hook setup</button>
+			<button id="copy-hook" class="copy-btn" type="button">Copy hook setup</button>
+			<span id="copy-status" class="sr-only" role="status"></span>
 			<pre><code>{AI_CODING_MODE.hookJson}</code></pre>
 		</div>
 	</section>
@@ -209,12 +284,12 @@ const jsonLd = {
 
 	<!-- Pro feature deep-dive -->
 	<section class="block">
-		<h2><span class="h2ico" set:html={icon('shield')} />More Pro guards</h2>
+		<h2><span class="h2ico" set:html={icon('shield')} />Pro guards: battery, thermal, clamshell, schedule</h2>
 		<div class="cards">
 			{
 				PRO_FEATURES.map((f) => (
 					<div class="card">
-						<h3>{f.title}</h3>
+						<h3><span class="cardico" set:html={icon(PRO_ICON[f.title] ?? 'shield')} />{f.title}</h3>
 						<p>{f.body}</p>
 					</div>
 				))
@@ -224,25 +299,40 @@ const jsonLd = {
 
 	<!-- Comparison -->
 	<section class="block">
-		<h2><span class="h2ico" set:html={icon('trophy')} />CleanKey vs the alternatives</h2>
+		<h2><span class="h2ico" set:html={icon('trophy')} />CleanKey vs Amphetamine, KeepingYouAwake, and CLI tools</h2>
 		<p class="muted">Facts checked 2026-07; competitors change, so re-verify before relying on this.</p>
 		<table class="cmp">
+			<caption class="sr-only">Feature comparison between CleanKey and alternative macOS keep-awake tools</caption>
 			<thead>
-				<tr><th></th>{COMPARISON_COLS.map((c, i) => <th class={i === 0 ? 'own' : ''}>{c}</th>)}</tr>
+				<tr>
+					<th scope="col"><span class="sr-only">Feature</span></th>
+					{COMPARISON_COLS.map((c, i) => <th scope="col" class={i === 0 ? 'own' : ''}>{c}</th>)}
+				</tr>
 			</thead>
 			<tbody>
 				{
 					COMPARISON_ROWS.map((row) => (
 						<tr>
-							<td class="row-label">{row.label}</td>
+							<th scope="row" class="row-label">{row.label}</th>
 							{row.values.map((v, i) => {
-								const yes = v.startsWith('Yes');
-								const no = v.startsWith('No');
+								// Word boundary so "Not documented" stays plain text instead of a false "No".
+								const yes = /^Yes\b/.test(v);
+								const no = /^No\b/.test(v);
 								const extra = v.replace(/^(Yes|No)\b\s*/, '');
 								return (
 									<td class={`${yes ? 'yes' : no ? 'no' : ''}${i === 0 ? ' own' : ''}`} data-label={COMPARISON_COLS[i]}>
-										{yes && <span class="ci ci-yes" set:html={icon('check')} />}
-										{no && <span class="ci ci-no" set:html={icon('cross')} />}
+										{yes && (
+											<>
+												<span class="ci ci-yes" set:html={icon('check')} />
+												<span class="sr-only">Yes</span>
+											</>
+										)}
+										{no && (
+											<>
+												<span class="ci ci-no" set:html={icon('cross')} />
+												<span class="sr-only">No</span>
+											</>
+										)}
 										{yes || no ? extra && <span class="ci-txt">{extra}</span> : <span class="ci-txt">{v}</span>}
 									</td>
 								);
@@ -264,7 +354,7 @@ const jsonLd = {
 			{
 				WHO_FOR.map((w) => (
 					<div class="card">
-						<h3>{w.title}</h3>
+						<h3><span class="cardico" set:html={icon(WHO_ICON[w.title] ?? 'users')} />{w.title}</h3>
 						<p>{w.body}</p>
 					</div>
 				))
@@ -282,25 +372,14 @@ const jsonLd = {
 
 	<!-- Pricing / get it -->
 	<section class="block get-block" id="get">
-		<h2><span class="h2ico" set:html={icon('download')} />Get CleanKey</h2>
-		<p>The lock is free to download and use. Pro unlocks keep-awake and everything above with a license key, activated in the app and sold through Polar. Pay what you want, from €2.99, with a 14-day refund.</p>
-		<div class="cta-row">
-			<a class="btn btn-primary" href={DOWNLOAD_URL}><span class="btnico" set:html={icon('download')} />Download free</a>
-			{
-				hasPolar ? (
-					<a class="btn btn-pro" href={POLAR_CHECKOUT_URL} data-polar-checkout data-polar-checkout-theme="dark">
-						Buy Pro{PRO_PRICE ? ` — ${PRO_PRICE}` : ''}
-					</a>
-				) : (
-					<span class="btn btn-disabled" aria-disabled="true">Pro — coming soon</span>
-				)
-			}
-		</div>
+		<h2><span class="h2ico" set:html={icon('download')} />Download CleanKey for macOS</h2>
+		<p>The lock is free to download and use. Pro unlocks keep-awake and everything above with a license key, activated in the app and sold through Polar. Pay what you want, from €2.99.</p>
+		<CtaRow note="Pay once, no subscription. 14-day refund, and the lock stays free either way." />
 	</section>
 
 	<!-- Screenshots -->
 	<section class="block">
-		<h2><span class="h2ico" set:html={icon('image')} />A look inside</h2>
+		<h2><span class="h2ico" set:html={icon('image')} />CleanKey screenshots: every pane</h2>
 		<div class="gallery">
 			{
 				SHOT_LIST.slice(1).map((s) => {
@@ -340,7 +419,7 @@ const jsonLd = {
 
 	<!-- FAQ -->
 	<section class="block">
-		<h2><span class="h2ico" set:html={icon('help')} />FAQ</h2>
+		<h2><span class="h2ico" set:html={icon('help')} />Frequently asked questions</h2>
 		<div class="faq">
 			{
 				FAQ.map((item) => (
@@ -357,17 +436,22 @@ const jsonLd = {
 <script is:inline>
 	(() => {
 		const btn = document.getElementById('copy-hook');
+		const status = document.getElementById('copy-status');
 		if (!btn) return;
+		const reset = () => {
+			btn.textContent = 'Copy hook setup';
+		};
 		btn.addEventListener('click', async () => {
 			const code = btn.parentElement?.querySelector('code')?.textContent ?? '';
 			try {
 				await navigator.clipboard.writeText(code);
 				btn.textContent = 'Copied!';
-				setTimeout(() => (btn.textContent = 'Copy hook setup'), 1500);
+				if (status) status.textContent = 'Hook setup copied to the clipboard';
 			} catch {
 				btn.textContent = 'Copy failed';
-				setTimeout(() => (btn.textContent = 'Copy hook setup'), 1500);
+				if (status) status.textContent = 'Copy failed';
 			}
+			setTimeout(reset, 1500);
 		});
 	})();
 </script>
@@ -375,22 +459,94 @@ const jsonLd = {
 <script is:inline>
 	(() => {
 		const v = document.querySelector('.hero-video');
-		if (v && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+		const btn = document.getElementById('video-toggle');
+		if (!v || !btn) return;
+		const setState = (playing) => {
+			btn.dataset.state = playing ? 'playing' : 'paused';
+			btn.setAttribute('aria-label', playing ? 'Pause video' : 'Play video');
+		};
+		v.addEventListener('play', () => setState(true));
+		v.addEventListener('pause', () => setState(false));
+		btn.addEventListener('click', () => {
+			if (v.paused) v.play();
+			else v.pause();
+		});
+		// Respect reduced motion: start paused on the poster frame instead of autoplaying.
+		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
 			v.removeAttribute('autoplay');
 			v.pause();
 			v.currentTime = 0;
+		}
+		setState(!v.paused);
+	})();
+</script>
+
+<script is:inline>
+	// Section reveal on scroll. Sections stay visible without JS or under reduced motion:
+	// the .reveal class (which hides them) is only ever added here.
+	(() => {
+		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+		if (!('IntersectionObserver' in window)) return;
+		const io = new IntersectionObserver(
+			(entries) => {
+				for (const e of entries) {
+					if (e.isIntersecting) {
+						e.target.classList.add('in');
+						io.unobserve(e.target);
+					}
+				}
+			},
+			{ rootMargin: '0px 0px -8% 0px', threshold: 0.05 },
+		);
+		for (const b of document.querySelectorAll('.block')) {
+			b.classList.add('reveal');
+			io.observe(b);
 		}
 	})();
 </script>
 
 <style>
+	/* Hero: the glow behind the headline breathes like a sleeping Mac's indicator light —
+	   the product's whole story (awake while it codes, asleep after) in one quiet motion. */
 	.hero {
+		position: relative;
 		text-align: center;
-		padding: 1em 0 2em;
+		padding: 1.5em 0 2em;
+	}
+	.hero::before {
+		content: '';
+		position: absolute;
+		left: 50%;
+		top: -3em;
+		width: min(48em, 110vw);
+		height: 26em;
+		transform: translateX(-50%);
+		background: radial-gradient(
+			closest-side at 50% 35%,
+			color-mix(in srgb, var(--accent) 18%, transparent),
+			transparent
+		);
+		pointer-events: none;
+		z-index: -1;
+	}
+	@media (prefers-reduced-motion: no-preference) {
+		.hero::before {
+			animation: breathe 7s ease-in-out infinite;
+		}
+	}
+	@keyframes breathe {
+		0%,
+		100% {
+			opacity: 0.55;
+		}
+		50% {
+			opacity: 1;
+		}
 	}
 	.hero h1 {
 		font-size: 2.8em;
 		line-height: 1.1;
+		letter-spacing: -0.02em;
 		margin-bottom: 0.3em;
 	}
 	.subhead {
@@ -399,50 +555,39 @@ const jsonLd = {
 		max-width: 40ch;
 		margin: 0 auto 1.4em;
 	}
-	.cta-row {
+	.chips {
 		display: flex;
-		gap: 0.75em;
+		gap: 0.5em;
 		justify-content: center;
 		flex-wrap: wrap;
+		list-style: none;
+		margin: 1.1em 0 0;
+		padding: 0;
 	}
-	.btn {
-		display: inline-block;
-		padding: 0.7em 1.4em;
-		border-radius: 10px;
-		font-weight: 700;
-		text-decoration: none;
-		cursor: pointer;
-		border: 1px solid transparent;
+	.chips li {
+		font-size: 0.82em;
+		color: rgb(var(--gray-dark));
+		border: 1px solid rgb(var(--gray-light));
+		background: rgb(var(--bg-elevated));
+		border-radius: 999px;
+		padding: 0.25em 0.85em;
 	}
-	.btn-primary {
-		background: linear-gradient(120deg, #17131f, var(--accent) 85%);
-		color: #fff;
-	}
-	.btn-primary:hover {
-		filter: brightness(1.12);
-	}
-	.btn-pro {
-		background: transparent;
-		color: var(--accent);
-		border-color: var(--accent);
-	}
-	.btn-pro:hover {
-		background: var(--accent);
-		color: #fff;
-	}
-	.btn-disabled {
-		background: transparent;
-		color: rgb(var(--gray));
-		border-color: rgb(var(--gray-light));
-		cursor: not-allowed;
-	}
-	.hero-note {
-		margin-top: 0.9em;
-		font-size: 0.9em;
-		color: rgb(var(--gray));
-	}
+
 	.block {
 		margin: 3em 0;
+	}
+	@media (prefers-reduced-motion: no-preference) {
+		.block.reveal {
+			opacity: 0;
+			transform: translateY(14px);
+			transition:
+				opacity 0.5s ease,
+				transform 0.5s ease;
+		}
+		.block.reveal.in {
+			opacity: 1;
+			transform: none;
+		}
 	}
 	.block > h2 {
 		display: flex;
@@ -463,17 +608,12 @@ const jsonLd = {
 		margin-right: 0.4em;
 		color: var(--accent);
 	}
-	.btnico {
-		display: inline-flex;
-		vertical-align: -0.18em;
-		margin-right: 0.4em;
-	}
 	h3.sub {
 		margin: 1.4em 0 0.5em;
 		font-size: 1.05rem;
 	}
 	.muted {
-		color: rgb(var(--gray));
+		color: rgb(var(--gray-dark));
 		font-size: 0.95em;
 	}
 
@@ -489,6 +629,9 @@ const jsonLd = {
 		padding: 0.55em 0.7em;
 		text-align: left;
 		vertical-align: top;
+	}
+	.fvp th[scope='row'] {
+		font-weight: 400;
 	}
 	.fvp th:nth-child(2),
 	.fvp th:nth-child(3),
@@ -523,9 +666,10 @@ const jsonLd = {
 	.cmp .row-label {
 		font-weight: 600;
 		font-size: 0.95em;
+		text-align: left;
 	}
-	.cmp th:not(:first-child),
-	.cmp td:not(.row-label) {
+	.cmp thead th:not(:first-child),
+	.cmp td {
 		text-align: center;
 	}
 	.cmp .own {
@@ -545,13 +689,14 @@ const jsonLd = {
 		display: block;
 		font-size: 0.82em;
 		line-height: 1.3;
-		color: rgb(var(--gray));
+		color: rgb(var(--gray-dark));
 	}
 	@media (max-width: 640px) {
 		.cmp,
 		.cmp tbody,
 		.cmp tr,
-		.cmp td {
+		.cmp td,
+		.cmp th[scope='row'] {
 			display: block;
 			width: 100%;
 		}
@@ -573,14 +718,14 @@ const jsonLd = {
 			gap: 1em;
 			text-align: right;
 		}
-		.cmp td.row-label {
+		.cmp th[scope='row'] {
 			text-align: left;
 			font-size: 1.05em;
 			border-bottom: 1px solid rgb(var(--gray-light));
 			margin-bottom: 0.4em;
 			padding-bottom: 0.4em;
 		}
-		.cmp td:not(.row-label)::before {
+		.cmp td::before {
 			content: attr(data-label);
 			color: rgb(var(--gray));
 			font-size: 0.9em;
@@ -631,17 +776,21 @@ const jsonLd = {
 		border: 1px solid rgb(var(--gray-light));
 		border-radius: 12px;
 		background: rgb(var(--bg-elevated));
-		transition: border-color 0.15s ease, transform 0.15s ease;
+		transition:
+			border-color 0.15s ease,
+			transform 0.15s ease;
+	}
+	@media (prefers-reduced-motion: no-preference) {
+		.card:hover {
+			transform: translateY(-2px);
+		}
 	}
 	.card:hover {
 		border-color: var(--accent);
-		transform: translateY(-2px);
 	}
 	.card h3 {
 		display: flex;
 		align-items: center;
-	}
-	.card h3 {
 		margin: 0 0 0.35em;
 		font-size: 1.15rem;
 	}
@@ -667,8 +816,8 @@ const jsonLd = {
 		border-radius: 16px;
 		background: rgb(var(--bg-elevated));
 	}
-	.get-block .cta-row {
-		margin: 1.2em 0 0.8em;
+	.get-block :global(.cta-row) {
+		margin-top: 1.2em;
 	}
 
 	.gallery {
@@ -696,28 +845,54 @@ const jsonLd = {
 		padding: 1em;
 		background: rgb(var(--gray-light));
 	}
-	.shot-hero .shot-placeholder {
+	.video-wrap {
+		position: relative;
 		max-width: 640px;
 		margin: 1.5em auto 0.5em;
 	}
 	.hero-video {
 		display: block;
 		width: 100%;
-		max-width: 640px;
-		margin: 1.5em auto 0.5em;
 		aspect-ratio: 16 / 10;
 		object-fit: cover;
 		border-radius: 12px;
 		border: 1px solid rgb(var(--gray-light));
 		background: #000;
 	}
+	.video-toggle {
+		position: absolute;
+		right: 0.6em;
+		bottom: 0.6em;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.2em;
+		height: 2.2em;
+		padding: 0;
+		border: 1px solid rgba(255, 255, 255, 0.35);
+		border-radius: 50%;
+		background: rgba(10, 8, 16, 0.65);
+		color: #fff;
+		cursor: pointer;
+	}
+	.video-toggle:hover {
+		background: rgba(10, 8, 16, 0.85);
+	}
+	.video-toggle svg {
+		width: 1em;
+		height: 1em;
+	}
+	.video-toggle[data-state='playing'] .ic-play,
+	.video-toggle[data-state='paused'] .ic-pause {
+		display: none;
+	}
 	.shot figcaption {
 		margin-top: 0.5em;
 		font-size: 0.9em;
-		color: rgb(var(--gray));
+		color: rgb(var(--gray-dark));
 		text-align: center;
 	}
-	.shot-img {
+	.shot :global(.shot-img) {
 		display: block;
 		width: 100%;
 		height: auto;
@@ -768,6 +943,5 @@ const jsonLd = {
 	/* Icons are injected via set:html, so their <svg> has no scope hash; size them globally. */
 	.h2ico svg { width: 1.05em; height: 1.05em; }
 	.cardico svg { width: 1.15em; height: 1.15em; vertical-align: -0.15em; }
-	.btnico svg { width: 1.05em; height: 1.05em; vertical-align: -0.15em; }
 	.ci svg { width: 1.3em; height: 1.3em; vertical-align: -0.25em; }
 </style>
