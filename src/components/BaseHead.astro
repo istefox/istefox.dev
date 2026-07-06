@@ -11,11 +11,25 @@ interface Props {
 	title: string;
 	description: string;
 	image?: ImageMetadata;
+	/** Alt text for the social-share image; falls back to the page title. */
+	imageAlt?: string;
+	/** Open Graph object type; pages override it (e.g. product landings). */
+	ogType?: string;
+	/** Open Graph locale (e.g. 'en_US'); omitted when not provided. */
+	ogLocale?: string;
 }
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
-const { title, description, image = FallbackImage } = Astro.props;
+const {
+	title,
+	description,
+	image = FallbackImage,
+	imageAlt = title,
+	ogType = 'website',
+	ogLocale,
+} = Astro.props;
+const imageURL = new URL(image.src, Astro.url);
 ---
 
 <!-- Apply the saved/system theme before first paint to avoid a flash of the wrong theme. -->
@@ -45,6 +59,8 @@ const { title, description, image = FallbackImage } = Astro.props;
 	href={new URL('rss.xml', Astro.site)}
 />
 <meta name="generator" content={Astro.generator} />
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#11141c" />
 
 <Font cssVariable="--font-atkinson" preload />
 
@@ -56,11 +72,20 @@ const { title, description, image = FallbackImage } = Astro.props;
 <meta name="description" content={description} />
 
 <!-- Open Graph / Facebook -->
-<meta property="og:type" content="website" />
+<meta property="og:type" content={ogType} />
 <meta property="og:url" content={Astro.url} />
+<meta property="og:site_name" content="istefox.dev" />
+{ogLocale && <meta property="og:locale" content={ogLocale} />}
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
-<meta property="og:image" content={new URL(image.src, Astro.url)} />
+<meta property="og:image" content={imageURL} />
+<meta property="og:image:width" content={String(image.width)} />
+<meta property="og:image:height" content={String(image.height)} />
+<meta property="og:image:alt" content={imageAlt} />
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={imageURL} />
+<meta name="twitter:image:alt" content={imageAlt} />
