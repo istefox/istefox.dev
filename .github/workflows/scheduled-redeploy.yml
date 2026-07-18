@@ -1,0 +1,32 @@
+# Daily rebuild via a Cloudflare Pages deploy hook, so the build-time launch ladder in
+# src/data/pricing.ts (and the appcast-resolved version string) can never go stale between
+# pushes. No-op until the CF_PAGES_DEPLOY_HOOK secret is set (Cloudflare Pages → Settings →
+# Builds & deployments → Deploy hooks; paste the hook URL as a repo Actions secret).
+#
+# The Polar dashboard price is NOT build-controlled: change it by hand at each ladder step.
+name: scheduled-redeploy
+
+permissions:
+  contents: read
+
+on:
+  schedule:
+    # 04:00 UTC daily; the ladder flips on 24h boundaries from day 0, so the first daily build
+    # after a step change picks it up the same morning.
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Cloudflare Pages build
+        env:
+          DEPLOY_HOOK: ${{ secrets.CF_PAGES_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$DEPLOY_HOOK" ]; then
+            echo "CF_PAGES_DEPLOY_HOOK secret not set; skipping."
+            exit 0
+          fi
+          curl -fsS -X POST "$DEPLOY_HOOK" > /dev/null
+          echo "Deploy hook triggered."

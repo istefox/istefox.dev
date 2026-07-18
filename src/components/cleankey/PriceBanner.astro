@@ -1,0 +1,101 @@
+---
+// The launch-ladder banner: the one sanctioned urgency device on the site, because every
+// date in it is real (see src/data/pricing.ts). Renders nothing before day 0 is set and
+// nothing once the €7.99 list price is live. Never a timer that resets: the deadline is an
+// absolute timestamp baked at build time.
+import { PRICING } from '../../data/pricing';
+
+// Dismissal is per ladder step, so the banner returns when the price actually changes.
+const storageKey = `ck-price-banner:${PRICING.step}`;
+
+// Injected with set:html: script text inside a JSX conditional would be HTML-escaped.
+const bannerScript = `(() => {
+	const banner = document.getElementById('price-banner');
+	if (!banner) return;
+	let dismissed = false;
+	try { dismissed = localStorage.getItem(${JSON.stringify(storageKey)}) === '1'; } catch {}
+	// A stale build past the deadline keeps the banner hidden rather than showing a past date.
+	const deadline = Date.parse(banner.dataset.deadline || '');
+	const expired = Number.isFinite(deadline) && Date.now() > deadline;
+	if (dismissed || expired) return;
+	const days = document.getElementById('price-banner-days');
+	if (days && Number.isFinite(deadline)) {
+		const left = Math.ceil((deadline - Date.now()) / 86400000);
+		if (left > 0) days.textContent = ' · ' + left + (left === 1 ? ' day left' : ' days left');
+	}
+	banner.hidden = false;
+	const dismiss = document.getElementById('price-banner-dismiss');
+	if (dismiss) dismiss.addEventListener('click', () => {
+		banner.hidden = true;
+		try { localStorage.setItem(${JSON.stringify(storageKey)}, '1'); } catch {}
+	});
+})();`;
+---
+
+{
+	PRICING.showBanner && (
+		<>
+			<div class="price-banner" id="price-banner" hidden data-deadline={PRICING.nextDateISO}>
+				<p>
+					{PRICING.bannerText}
+					<span id="price-banner-days" />
+				</p>
+				<button id="price-banner-dismiss" type="button" aria-label="Dismiss price notice">
+					<svg
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						aria-hidden="true"
+					>
+						<path d="M6 6l12 12M18 6L6 18" />
+					</svg>
+				</button>
+			</div>
+			<script is:inline set:html={bannerScript} />
+		</>
+	)
+}
+
+<style>
+	.price-banner {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.75em;
+		padding: 0.45em 1em;
+		background: var(--accent);
+		color: #fff;
+		font-size: 0.9em;
+		text-align: center;
+	}
+	.price-banner p {
+		margin: 0;
+		line-height: 1.4;
+	}
+	.price-banner button {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 1.7em;
+		height: 1.7em;
+		padding: 0;
+		flex: none;
+		border: none;
+		border-radius: 50%;
+		background: transparent;
+		color: #fff;
+		cursor: pointer;
+	}
+	.price-banner button:hover {
+		background: rgba(255, 255, 255, 0.18);
+	}
+	.price-banner button svg {
+		width: 0.9em;
+		height: 0.9em;
+	}
+	.price-banner button:focus-visible {
+		outline-color: #fff;
+	}
+</style>
