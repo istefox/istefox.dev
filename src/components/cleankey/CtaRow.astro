@@ -1,7 +1,9 @@
 ---
-// The CleanKey call-to-action pair (Download free + Buy Pro), shared by the landing hero,
+// The CleanKey call-to-action pair (Download free + Get Pro), shared by the landing hero,
 // the pricing block, and the download page so the offer copy can never drift apart.
-import { DOWNLOAD_URL, POLAR_CHECKOUT_URL, PRO_PRICE } from '../../data/cleankey';
+// The Pro price comes from the launch ladder; below list price it shows the struck €7.99.
+import { DOWNLOAD_URL, POLAR_CHECKOUT_URL } from '../../data/cleankey';
+import { PRICING } from '../../data/pricing';
 
 interface Props {
 	showDownload?: boolean;
@@ -13,6 +15,7 @@ interface Props {
 
 const { showDownload = true, proVariant = 'outline', note } = Astro.props;
 const hasPolar = POLAR_CHECKOUT_URL !== '';
+const belowList = PRICING.price !== PRICING.listPrice;
 ---
 
 <div class="cta-row">
@@ -32,7 +35,7 @@ const hasPolar = POLAR_CHECKOUT_URL !== '';
 					<path d="M12 3v12M7 10l5 5 5-5" />
 					<path d="M4 21h16" />
 				</svg>
-				Download free
+				Download free for macOS 14+
 			</a>
 		)
 	}
@@ -44,7 +47,15 @@ const hasPolar = POLAR_CHECKOUT_URL !== '';
 				data-polar-checkout
 				data-polar-checkout-theme="dark"
 			>
-				Buy Pro{PRO_PRICE ? ` — ${PRO_PRICE}` : ''}
+				Get Pro for {PRICING.price}
+				{belowList && (
+					<>
+						<s class="list-price" aria-hidden="true">
+							{PRICING.listPrice}
+						</s>
+						<span class="sr-only">, list price {PRICING.listPrice}</span>
+					</>
+				)}
 			</a>
 		) : (
 			<span class="btn btn-disabled" aria-disabled="true">
@@ -112,6 +123,11 @@ const hasPolar = POLAR_CHECKOUT_URL !== '';
 		color: rgb(var(--gray));
 		border-color: rgb(var(--gray-light));
 		cursor: not-allowed;
+	}
+	.list-price {
+		font-weight: 400;
+		opacity: 0.65;
+		font-size: 0.9em;
 	}
 	.cta-note {
 		margin: 0.8em 0 0;

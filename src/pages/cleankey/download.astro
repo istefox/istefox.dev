@@ -1,7 +1,11 @@
 ---
 import ProductPage from '../../layouts/ProductPage.astro';
 import CtaRow from '../../components/cleankey/CtaRow.astro';
+import PriceBanner from '../../components/cleankey/PriceBanner.astro';
 import { resolveAppcast } from '../../data/appcast';
+import { POLAR_CHECKOUT_URL } from '../../data/cleankey';
+
+const hasPolar = POLAR_CHECKOUT_URL !== '';
 
 // Current DMG + version resolved from the Sparkle appcast at build time (shared resolver,
 // see src/data/appcast.ts), so the download always matches the latest signed release.
@@ -15,7 +19,20 @@ const { dmgUrl, version } = await resolveAppcast();
 >
 	<Fragment slot="head">
 		<meta name="robots" content="noindex" />
+		{/* Same SRI-pinned Polar embed as the landing, so the Get Pro button opens the
+		    embedded checkout here too instead of navigating away mid-download. */}
+		{hasPolar && (
+			<script
+				src="https://cdn.jsdelivr.net/npm/@polar-sh/checkout@0.1.15/dist/embed.global.js"
+				integrity="sha384-cahoDBb6jqcy/nI95rzv3Y/qHhTMk6K/P23HB8wK8Exw/CWv659cFJycoxNkEjEs"
+				crossorigin="anonymous"
+				defer
+				data-auto-init
+			></script>
+		)}
 	</Fragment>
+
+	<PriceBanner slot="banner" />
 
 	<section class="dl">
 		<div class="spinner" aria-hidden="true"></div>

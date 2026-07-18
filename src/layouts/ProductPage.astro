@@ -39,6 +39,7 @@ const { title, description, productName, image, imageAlt } = Astro.props;
 				<ThemeToggle />
 			</nav>
 		</header>
+		<slot name="banner" />
 		<main id="main" class="product-main">
 			<slot />
 		</main>

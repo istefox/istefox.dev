@@ -1,16 +1,9 @@
 // Structured content for the CleanKey product landing page (/cleankey), in English.
-// Source of truth: docs/spec/CleanKey-spec.md. Kept data-driven so copy is easy to edit and translate.
+// Source of truth: docs/marketing/website-refactor-handoff-2026-07-18.md in the CleanKey repo
+// (verified against v1.16.1). Kept data-driven so copy is easy to edit and translate.
+// Every price on the page comes from the launch ladder in ./pricing — never hardcode one here.
 
-export interface FeatureRow {
-  feature: string;
-  free: boolean;
-  pro: boolean;
-}
-
-export interface ProFeature {
-  title: string;
-  body: string;
-}
+import { PRICING } from "./pricing";
 
 export interface AutomationAction {
   name: string;
@@ -19,8 +12,13 @@ export interface AutomationAction {
 
 export interface ComparisonRow {
   label: string;
-  // order: CleanKey, Amphetamine, KeepingYouAwake, Adrafinil (CLI)
+  // order: CleanKey, Amphetamine, Adrafinil, Agent Caffeine
   values: string[];
+}
+
+export interface UseCase {
+  title: string;
+  body: string;
 }
 
 export interface FaqItem {
@@ -28,9 +26,14 @@ export interface FaqItem {
   a: string;
 }
 
+export interface FooterLink {
+  label: string;
+  href: string;
+}
+
 export interface Shot {
   // Filename under src/assets/cleankey/ (matched by import.meta.glob). Rendered as a placeholder
-  // until the real asset exists. `title`/`desc` add a caption under the shot in the gallery.
+  // until the real asset exists. `title`/`desc` add a caption under the shot.
   key: string;
   caption: string;
   title?: string;
@@ -38,66 +41,37 @@ export interface Shot {
 }
 
 export const HERO = {
-  headline: "Awake while it codes. Asleep when it’s done.",
+  headline: "CleanKey knows when your unattended work is done.",
+  // Doubles as the self-contained "what is CleanKey" answer block for AI search (40–60 words).
   subhead:
-    "Start a long run in Claude Code or Codex, then walk away. CleanKey keeps the Mac awake while the agent works and lets it sleep the moment it stops. It also locks the keyboard and trackpad so you can wipe them clean.",
+    "It watches your AI coding agents, Claude Code, Cursor, Codex, Gemini and more, and keeps your Mac awake, lid closed if you want, only while they are working. The moment the last one finishes it can notify you, run your Shortcut, and put the Mac to sleep. And it locks your keyboard so you can clean it. That part is free.",
   // Trust chips under the CTAs. Kept short: each one answers a purchase objection.
   chips: [
-    "macOS, notarized",
-    "Pay once — from €2.99",
+    "macOS 14+, notarized",
+    `Pay once — ${PRICING.price}`,
     "14-day refund",
     "No subscription",
   ],
+  ctaPrimary: "Download free for macOS 14+",
 };
 
 // Used for <meta description> and OG. Keep ≤160 chars so search results show it uncut.
 export const META_DESCRIPTION =
-  "Free macOS keyboard and trackpad lock for cleaning, plus Pro keep-awake with AI coding mode: your Mac stays awake while Claude Code or Codex works, then sleeps.";
+  "CleanKey keeps your Mac awake while AI coding agents like Claude Code work, lid closed if you want, then lets it sleep when they finish. The cleaning lock is free.";
 
-export const WHAT_IT_DOES: string[] = [
-  "Click the menu-bar icon and pick a duration to lock the keyboard and trackpad, then clean the keys without triggering anything. A countdown shows the time left, and three quick presses of Escape unlock immediately if you need out. That part is free.",
-  "The Pro tier adds keep-awake: stop the Mac (and optionally the display) from sleeping, with real safety rails. It pauses when the Mac runs hot, steps aside when the battery gets low, can stay awake with the lid closed, and can follow a weekly schedule. The headline Pro feature is AI coding mode, which links keep-awake to your AI coding agent’s activity and can close the loop by running an action sequence when the agent is done.",
-];
+// The pain, three lines. Verbatim from the handoff.
+export const PAIN = {
+  title: "The three-hour run that died at minute four",
+  body: "You kick off a three-hour agent run, close the lid, and the Mac goes to sleep at minute four. So you prop the lid open with a book and leave the machine running warm all night for a job that finished at 1 AM. Keep-awake apps hold the Mac awake; none of them knows when the work is done.",
+};
 
-export const FREE_VS_PRO: FeatureRow[] = [
-  { feature: "Lock keyboard + trackpad for cleaning", free: true, pro: true },
-  {
-    feature: "Lock scope: keyboard+trackpad or keyboard-only",
-    free: true,
-    pro: true,
-  },
-  { feature: "Quick-pick lock durations", free: true, pro: true },
-  { feature: "Triple-Escape emergency unlock", free: true, pro: true },
-  { feature: "Countdown overlay / HUD", free: true, pro: true },
-  { feature: "Global hotkey to lock", free: true, pro: true },
-  { feature: "Sound feedback, launch at login", free: true, pro: true },
-  { feature: "Alerts Center (state-change log)", free: true, pro: true },
-  { feature: "Auto-update (Sparkle)", free: true, pro: true },
-  { feature: "Keep Awake (system + display)", free: false, pro: true },
-  { feature: "Auto-off cap + re-enable on launch", free: false, pro: true },
-  {
-    feature: "Battery guards (only-while-charging, % cutoff)",
-    free: false,
-    pro: true,
-  },
-  { feature: "Thermal protection (pause when hot)", free: false, pro: true },
-  { feature: "Clamshell keep-awake (lid closed)", free: false, pro: true },
-  { feature: "Weekly + one-shot schedule", free: false, pro: true },
-  { feature: "AI coding mode (Claude Code / Codex)", free: false, pro: true },
-  {
-    feature: "End-of-session automations (notify, run Shortcut, lock, sleep)",
-    free: false,
-    pro: true,
-  },
-];
-
-// The flagship feature gets a dedicated block with the hook snippet; the rest are short cards.
-export const AI_CODING_MODE = {
-  title: "AI coding mode for Claude Code and Codex",
+// How it knows: the signal in one paragraph (handoff copy), plus the manual hook snippet for
+// people who want to see exactly what gets installed.
+export const HOW_IT_KNOWS = {
+  title: "How it knows: hooks, a process fallback, and a fail-safe",
   body: [
-    "Run a long task in Claude Code or Codex and walk away. While the agent works, the Mac stays awake; when it stops, the Mac sleeps. CleanKey watches a small heartbeat file that your AI tool’s hooks touch on each unit of work. If the file was touched recently, the agent is active and keep-awake is on; once it goes stale past your idle timeout, keep-awake releases.",
-    "It is tool-agnostic on purpose: CleanKey watches a file, not a specific product, so anything that can touch a file drives it. It is also fail-safe: if the agent crashes, the terminal closes, or a hook never runs, the window simply lapses and the Mac sleeps. It never gets stuck awake.",
-    "Setup is one paste. The pane has a “Copy hook setup” button; drop the result into Claude Code’s ~/.claude/settings.json (or the Codex equivalent). After an app update the installed hook refreshes itself, so the commands it injects always match the current version with no manual remove and re-add:",
+    "CleanKey installs a tiny activity hook into each coding tool with one click (nine tools built in, custom agents supported), and falls back to process detection for tools without hooks. Every session reports a heartbeat; when the last one goes quiet, the work is done. The design is fail-safe: a missed signal lets the Mac sleep. It never gets stuck awake.",
+    "Prefer to wire it yourself? This is the whole hook, ready to paste into Claude Code’s ~/.claude/settings.json. After an app update the installed hook refreshes itself, so it always matches the current version:",
   ],
   hookJson: `{
   "hooks": {
@@ -108,12 +82,48 @@ export const AI_CODING_MODE = {
 }`,
 };
 
-// End-of-session automations (ADR-012). The "what happens when it's done" companion to AI
-// coding mode: a trigger fires an ordered action sequence behind a cancelable countdown.
+// Feature grid. The governing rule, quotable: the signal is free, the reaction is paid.
+export const FEATURE_RULE = "The signal is free. The reaction is paid.";
+
+export const FREE_FEATURES: string[] = [
+  "System-wide keyboard and trackpad lock, 5 seconds to 10 minutes on a two-zone slider",
+  "Full-screen dark overlay on every display with a live countdown; timing survives sleep and wake",
+  "Compact HUD-corner mode, and a keyboard-only mode that leaves the cursor visible",
+  "Triple-Escape emergency unlock, always available",
+  "Quick-pick durations, recordable global hotkey, sound feedback, last duration remembered",
+  "Self-healing watchdog restores input automatically if the tap or the permission is lost",
+  "Live per-tool agent status in the menu: working or idle and for how long, across concurrent sessions",
+  "One-click hook install; nine tools built in (Claude Code, Codex, Cursor, Gemini, Aider, OpenCode, Cline, Hermes, Pi) plus custom agents",
+  "Hook-free process detection fallback against a verified allowlist, with CPU-idle release",
+  "Live view of the session dashboard",
+];
+
+export const PRO_FEATURES_LIST: string[] = [
+  "Display-only or full-system sleep prevention, with an auto-off cap and re-enable on launch",
+  "Battery guards: only-while-charging, and a battery cutoff (default 30%) with a re-enable-anyway banner",
+  "Thermal guard: pauses on overheat and resumes on cooldown, trigger level configurable",
+  "Clamshell keep-awake (lid closed, no external display) via a lease-bound privileged helper: a crashed app can never leave the Mac stuck awake",
+  "Lid-close confirmation chime, plus four distinct pre-sleep motifs",
+  "Lid-open summary notification: what ran, for how long, peak thermal pressure, guards fired",
+  "One-shot and true weekly recurring schedules",
+  "AI Coding mode: awake only while at least one agent works, released the instant the last goes idle",
+  "Fail-safe throughout: a missed signal lets the Mac sleep, never the reverse",
+  "Agent notifications, each toggleable: all idle, unexpected end, long-running session, session started",
+  "End-of-session automations: Notify, Run Shortcut, Lock, Sleep behind a cancellable countdown",
+  "In-app Alerts log of every automatic state change, surfaced by a menu-bar badge",
+  "Dashboard History, Metrics, and Billing panes; per-project billable time with rounding rules and CSV export",
+  "Consent-gated token-cost estimation for Claude Code sessions: usage and model fields only, never conversation content",
+  "Retention controls: row cap and time window",
+  "cleankey CLI (hold, release, acquire, status), file-based and SSH-reachable, works with the app closed",
+  "MCP server: hold, release, and status as agent-callable tools, one-click install into Claude Code",
+  "Menu-bar quick holds from 15 minutes to until-stopped, with live remaining time",
+];
+
+// The finish line: end-of-session automations (the flagship scenario).
 export const AUTOMATIONS = {
-  title: "Close the loop: end-of-session automations",
+  title: "The finish line: what happens when the work ends",
   body: [
-    "AI coding mode keeps the Mac awake while your agent works. End-of-session automations decide what happens the moment it stops. Pick a trigger, pick the actions, and CleanKey runs them while you are away from the desk.",
+    "Keep-awake gets your run to the end. End-of-session automations decide what happens the moment it stops: pick a trigger, pick the actions, and CleanKey runs them while you are away from the desk.",
     "The flagship case: your agent goes idle for twenty minutes, CleanKey sends a notification, runs your cleanup Shortcut, and puts the Mac to sleep. You come back to finished work and a cool, sleeping machine.",
   ],
   triggers: [
@@ -140,145 +150,211 @@ export const AUTOMATIONS = {
     },
   ] as AutomationAction[],
   safety:
-    "Every sequence opens with a countdown you can cancel, from ten seconds to five minutes. Move the mouse, press a key, or click Cancel and nothing runs. If your agent picks the work back up, the countdown cancels itself. A failed step never blocks the others, only one sequence runs at a time, and the Alerts Center logs every run.",
+    "Every sequence opens with a countdown you can cancel, from ten seconds to five minutes. Move the mouse, press a key, or click Cancel and nothing runs. If your agent picks the work back up, the countdown cancels itself. A failed step never blocks the others, only one sequence runs at a time, and the Alerts log records every run.",
 };
 
-export const PRO_FEATURES: ProFeature[] = [
-  {
-    title: "Keep Awake",
-    body: "Prevent system sleep, or both system and display sleep. Set a maximum duration so it turns itself off after a few hours, and optionally re-arm on launch.",
-  },
-  {
-    title: "Thermal protection",
-    body: "Pause keep-awake when the Mac reaches a thermal pressure level you choose, and resume when it cools. Most keep-awake apps have no thermal guard and lean on macOS throttling instead.",
-  },
-  {
-    title: "Battery guards",
-    body: "Turn keep-awake off below a battery percentage you set, or only allow it while charging. This protects the charge when you are unplugged.",
-  },
-  {
-    title: "Clamshell keep-awake",
-    body: "Keep the Mac awake with the lid closed, driven by a signed privileged helper that leases the awake state and clears it automatically if CleanKey stops. A crash or force-quit does not leave the Mac stuck awake.",
-  },
-  {
-    title: "Schedule",
-    body: "Arm keep-awake for a one-shot window or a recurring weekly schedule, so it turns on and off on its own.",
-  },
-];
+// Comparison. Verbatim handoff intro; cells verified 2026-07-18 against caffeinagent.com,
+// github.com/kageroumado/adrafinil (v1.5.1), and the Amphetamine App Store page. Two handoff
+// [VERIFY] markers resolved on the same day: Agent Caffeine's battery clamshell needs a
+// one-time sudoers setup (confirmed on caffeinagent.com); Amphetamine's "~20% auto-off" was
+// not confirmable, so its cell states only the documented low-battery auto-end.
+export const COMPARISON_INTRO =
+  "Amphetamine is excellent and free, and it deserves its reputation. But like every mainstream keep-awake app it has no idea what your agents are doing. Two newer tools do: Adrafinil (free, macOS 26.4+ only) and Agent Caffeine ($9). Here is the honest picture, feature by feature, sources checked July 2026.";
 
 export const COMPARISON_COLS = [
   "CleanKey",
   "Amphetamine",
-  "KeepingYouAwake",
-  "Adrafinil (CLI)",
+  "Adrafinil",
+  "Agent Caffeine",
 ];
+
 export const COMPARISON_ROWS: ComparisonRow[] = [
-  { label: "Keyboard + trackpad lock", values: ["Yes", "No", "No", "No"] },
-  { label: "Keep-awake", values: ["Yes", "Yes", "Yes", "Yes"] },
   {
-    label: "Battery % cutoff",
-    values: ["Yes", "Yes", "Yes (Low Power Mode)", "Not documented"],
+    label: "Price",
+    values: [
+      PRICING.step === "final"
+        ? "Free + Pro €7.99 one-time"
+        : `Free + Pro ${PRICING.price} one-time (list ${PRICING.listPrice})`,
+      "Free",
+      "Free (MIT)",
+      "$9 one-time",
+    ],
+  },
+  { label: "macOS required", values: ["14+", "10.13+", "26.4+", "13+"] },
+  {
+    label: "Detects AI coding agents",
+    values: [
+      "Yes (hooks + process fallback)",
+      "No",
+      "Yes (hooks + process fallback)",
+      "Yes (process polling, 5 s)",
+    ],
   },
   {
-    label: "Thermal pause",
-    values: ["Yes", "No (relies on macOS)", "No", "Yes"],
+    label: "Agent tools covered",
+    values: [
+      "9 built-in + custom UI",
+      "n/a",
+      "9 hooks + custom via CLI",
+      "40+ allowlist, editable",
+    ],
   },
   {
-    label: "Clamshell (lid closed)",
-    values: ["Yes (leased helper)", "Yes (v5.0+)", "No", "Yes (XPC helper)"],
+    label: "Awake only while agents work",
+    values: ["Yes", "No", "Yes", "Yes"],
   },
   {
-    label: "AI-agent-driven awake",
-    values: ["Yes (file heartbeat)", "No", "No", "Yes (process/agent)"],
+    label: "End-of-session action chain (notify, Shortcut, lock, sleep)",
+    values: [
+      "Yes (cancellable countdown)",
+      "No (AppleScript for external automation)",
+      "No",
+      "No",
+    ],
   },
   {
-    label: "Menu-bar GUI app",
-    values: ["Yes", "Yes", "Yes", "No (command line)"],
+    label: "Agent notifications (idle / unexpected end / long-run)",
+    values: ["Yes", "No", "No", "No"],
   },
   {
-    label: "Notarized paid app",
-    values: ["Yes", "Free", "Free / open source", "Free / open source"],
+    label: "Clamshell: lid closed, no external display",
+    values: [
+      "Yes (built-in helper)",
+      "Partial (separate Enhancer app)",
+      "Yes",
+      "Partial (one-time sudo setup on battery)",
+    ],
+  },
+  {
+    label: "Lid-close chime + pre-sleep sounds",
+    values: ["Yes (chime + 4 motifs)", "No", "Partial (chime)", "No"],
+  },
+  { label: "Lid-open summary", values: ["Yes", "No", "Yes", "No"] },
+  {
+    label: "Thermal guard",
+    values: [
+      "Yes (pause + auto-resume, configurable)",
+      "No",
+      "Partial (force-release)",
+      "No",
+    ],
+  },
+  {
+    label: "Battery guards (cutoff %, only-while-charging)",
+    values: ["Yes (both)", "Partial (low-battery auto-end)", "No", "No"],
+  },
+  {
+    label: "Native scheduling (one-shot + weekly)",
+    values: ["Yes", "Partial (clock-time triggers)", "No", "No"],
+  },
+  { label: "SSH-reachable CLI", values: ["Yes", "No", "Yes", "No"] },
+  { label: "MCP tool for agents", values: ["Yes", "No", "Yes", "No"] },
+  {
+    label: "Timed holds from the menu",
+    values: [
+      "Yes (presets + readout)",
+      "Yes (durations)",
+      "Yes (time-boxed)",
+      "No",
+    ],
+  },
+  {
+    label: "Session history, metrics, billing, token cost",
+    values: ["Yes", "No", "No", "Partial (reads Claude session files)"],
+  },
+  { label: "In-app alerts log", values: ["Yes", "No", "No", "No"] },
+  {
+    label: "Keyboard/trackpad cleaning lock",
+    values: ["Yes (free)", "No", "No", "No"],
   },
 ];
 
-export const DIFFERENTIATORS: string[] = [
-  "Lock plus keep-awake, together. No single app does both; lock tools and keep-awake tools are always separate.",
-  "AI coding mode in a polished menu-bar app, not a CLI. It triggers off a plain file heartbeat, so any tool that can touch a file works, with no dedicated binary to call.",
-  "Thermal pause is rare. Among mainstream menu-bar keep-awake apps, none pause on heat; they defer to macOS. CleanKey pauses at a level you pick.",
-  "Fail-safe by design. The lock auto-releases if Accessibility permission is lost, the clamshell helper clears its lease if the app stops, and the AI window lapses on a missed signal. The Mac is never left stuck.",
+// The mainstream field in one line, and the honest CleanKey-only set among the four apps
+// above. Clamshell, lid-open summary, CLI, and MCP are NOT in this list on purpose:
+// Adrafinil has all four since v1.5.1.
+export const COMPARISON_FOOTNOTES: string[] = [
+  "The mainstream field, briefly: KeepingYouAwake (free, MIT), Caffeinated ($3.99), and Lungo ($4) are manual on/off tools. None of the three detects agents, schedules natively, runs end-of-session actions, or supports a closed lid without an external display.",
+  "Where CleanKey stands alone in this table: native scheduling, end-of-session chains, battery guards, the agent notifications suite, the dashboard with billing and token cost, the alerts log, a thermal guard that pauses and resumes, macOS 14+ reach, and the free cleaning lock.",
 ];
 
-export const WHO_FOR: ProFeature[] = [
+export const USE_CASES: UseCase[] = [
   {
-    title: "The vibe coder",
-    body: "Runs Claude Code or Codex on long tasks and wants the Mac awake during the run and asleep after, without babysitting a timer.",
+    title: "Agents overnight",
+    body: "Start Claude Code or Codex before bed and close the lid. CleanKey holds the Mac awake exactly as long as the run lasts, then notifies you, runs your Shortcut, and lets it sleep.",
   },
   {
-    title: "The clamshell power user",
-    body: "Docks to an external display, or runs headless overnight jobs with the lid shut, and wants safety guards so nothing overheats.",
+    title: "Renders and backups",
+    body: "Long exports, builds, and backup jobs get a timed or scheduled hold with battery and thermal guards, and the lid-open summary tells you how it went.",
   },
   {
-    title: "Everyone with a dirty keyboard",
-    body: "Wants to wipe the keys and trackpad without typing nonsense, with a guaranteed way out.",
+    title: "Presentations",
+    body: "A quick menu-bar hold keeps the display awake through a talk or a screen share, then expires on its own. No trip to System Settings.",
+  },
+  {
+    title: "Cleaning the keyboard",
+    body: "Lock the keyboard and trackpad for a set time, wipe everything down, and triple-press Escape if you need out early. That part is free.",
   },
 ];
 
-export const TRUST: string[] = [
-  "Notarized by Apple, Hardened Runtime on.",
-  "Auto-updates are cryptographically signed (EdDSA) on top of Gatekeeper, via Sparkle.",
-  "Fail-safe watchdog throughout; wall-clock timekeeping so the countdown survives sleep and wake.",
-  "Transparent Alerts Center logs every automatic state change, so you always see why the Mac was released or the lock ended.",
-  "Local only. Keep-awake follows a file on your own machine; nothing about your work leaves the Mac.",
-];
+// Pricing section. The ladder sentence and prices come from ./pricing.
+export const PRICING_COPY = {
+  title: "Get CleanKey",
+  freeName: "Free",
+  freeBody:
+    "The whole lock, the live agent status, the hook installer, process detection, and the dashboard’s live view.",
+  proName: "Pro",
+  proBody:
+    "Everything that reacts: keep-awake and its guards, schedules, automations, notifications, history and billing, the CLI and the MCP tool.",
+  note: "Pay once, no subscription. 14-day refund, and the lock stays free either way.",
+};
 
+// FAQ. The first eight are verbatim from the handoff (the trust floor: permissions,
+// stuck-awake risk, privacy, why not MAS); the last four cover the practical questions
+// buyers actually send. Phrased the way people type them into a search box.
 export const FAQ: FaqItem[] = [
   {
-    q: "Does it need Accessibility permission?",
-    a: "Yes, the lock uses it to block input. If the permission is ever revoked, the lock releases itself.",
+    q: "Does it really keep the Mac awake with the lid closed?",
+    a: "Yes, with no external display, through a privileged helper you approve on first use. The helper holds a lease that the app renews every few seconds; if CleanKey ever crashes, the lease expires and the Mac sleeps normally. It cannot get stuck awake.",
   },
   {
-    q: "Will keep-awake drain my battery?",
-    a: "Only if you let it. Set a battery cutoff or “only while charging”, and it steps aside when unplugged or low.",
+    q: "Why does CleanKey need the Accessibility permission?",
+    a: "The keyboard lock swallows input events system-wide, which macOS only allows to apps you trust in System Settings, Privacy & Security, Accessibility. The keep-awake side does not use it.",
   },
   {
-    q: "Does it work with the lid closed?",
-    a: "Yes, with the clamshell option. It uses a signed helper that clears the awake state automatically if the app stops.",
+    q: "Does CleanKey read my code or my conversations?",
+    a: "No. The agent hooks report only 'this session is alive' heartbeats. The optional token-cost estimate reads usage and model fields from local Claude Code session files, only after you opt in, and never the conversation content. There is no telemetry.",
   },
   {
-    q: "Does AI coding mode work with Codex, not just Claude Code?",
-    a: "Yes. It watches a file, so any tool whose hooks can touch that file works, including Codex.",
+    q: "What happens if an agent hangs or a hook misses?",
+    a: "The Mac sleeps. Every detection path fails toward sleep, never toward stuck-awake. Battery cutoff and thermal pause add two more layers of protection.",
   },
   {
-    q: "What can it do when my agent finishes?",
-    a: "End-of-session automations run a sequence you choose: notify, run a macOS Shortcut, lock, then sleep. A countdown you can cancel runs first, and nothing happens if you move the mouse or the agent starts working again.",
+    q: "How is this different from Amphetamine?",
+    a: "Amphetamine starts and stops awake sessions on triggers like time, app, or battery. It cannot tell whether your agents are working, and it cannot run actions when the work ends. CleanKey does both.",
   },
   {
-    q: "What if my agent crashes mid-task?",
-    a: "The heartbeat goes stale and the Mac sleeps after the idle timeout. Nothing is left stuck awake.",
+    q: "Adrafinil is free. Why pay for CleanKey?",
+    a: "Adrafinil covers keep-awake for agents and requires macOS 26.4. CleanKey runs on macOS 14+, adds weekly schedules, battery guards, agent notifications, end-of-session action chains, a session dashboard with billable time and token costs, and the keyboard-cleaning lock. If Adrafinil covers your need, use it; it is good software.",
   },
   {
-    q: "Will it get hot running overnight?",
-    a: "Thermal protection pauses keep-awake when the Mac gets too warm and resumes when it cools.",
+    q: "Why is CleanKey not on the Mac App Store?",
+    a: "The App Store sandbox forbids the two things CleanKey exists to do: suppressing input events and installing the lid-closed helper. The DMG is signed and notarized by Apple's process, and Sparkle keeps it updated.",
+  },
+  {
+    q: "What exactly is free?",
+    a: "The whole lock, the live agent status, the hook installer, process detection, and the dashboard's live view. Pro adds everything that reacts: keep-awake and its guards, schedules, automations, notifications, history and billing, the CLI and the MCP tool.",
   },
   {
     q: "How do updates work?",
-    a: "Built-in, signed, one click. The app checks, downloads, verifies, installs, and relaunches.",
-  },
-  {
-    q: "How do I buy CleanKey Pro?",
-    a: "Buy a license through Polar, then paste the key into the app’s License pane. Every Pro feature unlocks, and the lock stays free either way.",
-  },
-  {
-    q: "How much does Pro cost?",
-    a: "Pay what you want, from €2.99, with €4.99 suggested. One payment, not a subscription, and the license is yours to keep.",
-  },
-  {
-    q: "Can I get a refund?",
-    a: "Yes. If Pro is not for you, ask within 14 days and you get a full refund.",
+    a: "Through Sparkle, built in: the app checks, downloads, verifies the signature, installs, and relaunches. Updates are included for life.",
   },
   {
     q: "Is it a subscription?",
-    a: "No. You pay once, keep the license, and updates arrive in the app.",
+    a: "No. One payment through Polar, the license key is yours, and every update is included.",
+  },
+  {
+    q: "Can I get a refund?",
+    a: "Yes. If Pro is not for you, write within 14 days of purchase and you get a full refund.",
   },
   {
     q: "How do I get help?",
@@ -286,11 +362,27 @@ export const FAQ: FaqItem[] = [
   },
 ];
 
+// Footer. The source repo is private, so GitHub links point at the public releases repo
+// (signed DMGs + changelog); no source-repo link is exposed.
+export const FOOTER_PRIVACY =
+  "No telemetry. The only network calls CleanKey makes are Sparkle update checks, license validation, and the pricing-table refresh you trigger yourself.";
+
+export const FOOTER_LINKS: FooterLink[] = [
+  {
+    label: "Releases and changelog",
+    href: "https://github.com/istefox/CleanKey-releases/releases",
+  },
+  { label: "Download", href: "/cleankey/download" },
+  { label: "Contact", href: "mailto:stefferri@icloud.com" },
+  { label: "GitHub Sponsors", href: "https://github.com/sponsors/istefox" },
+  { label: "Ko-fi", href: "https://ko-fi.com/stefox" },
+];
+
 export const SHOT_LIST: Shot[] = [
-  // index 0 is the hero (rendered as a <video>, not in the gallery).
+  // index 0 is the hero (rendered as a <video>, not inline).
   {
     key: "hero-ai-coding-mode.gif",
-    caption: "Awake while it codes. Asleep when it’s done.",
+    caption: "CleanKey knows when your unattended work is done.",
   },
   {
     key: "keep-awake-pane.png",
@@ -330,8 +422,8 @@ export const SHOT_LIST: Shot[] = [
   },
   {
     key: "alerts-center.png",
-    caption: "Alerts Center",
-    title: "Alerts Center",
+    caption: "Alerts log",
+    title: "Alerts log",
     desc: "CleanKey logs every automatic state change, so you always see why keep-awake released or a session ended.",
   },
   {
@@ -351,8 +443,7 @@ export const DOWNLOAD_URL = "/cleankey/download";
 // The Sparkle appcast resolver (latest DMG + version at build time) lives in src/data/appcast.ts.
 
 // Polar embedded checkout. Set POLAR_CHECKOUT_URL to the product/checkout link; leave '' to render
-// the Buy-Pro CTA as "coming soon". Pro is pay-what-you-want (min €2.99, suggested €4.99); PRO_PRICE
-// is the display figure on the CTA (the Polar checkout shows the real amount either way).
+// the Buy-Pro CTA as "coming soon". The price shown anywhere on the site comes from ./pricing
+// (launch ladder); the product price in the Polar dashboard must be kept in step by hand.
 export const POLAR_CHECKOUT_URL: string =
   "https://buy.polar.sh/polar_cl_PBbomGVla4ni0vXmxjgo5myXmxtWNqyRCb2Og4K4BvS";
-export const PRO_PRICE: string | null = "€4.99";
