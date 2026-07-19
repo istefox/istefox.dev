@@ -157,15 +157,19 @@ export const AUTOMATIONS = {
 // github.com/kageroumado/adrafinil (v1.5.1), and the Amphetamine App Store page. Two handoff
 // [VERIFY] markers resolved on the same day: Agent Caffeine's battery clamshell needs a
 // one-time sudoers setup (confirmed on caffeinagent.com); Amphetamine's "~20% auto-off" was
-// not confirmable, so its cell states only the documented low-battery auto-end.
+// not confirmable, so its cell states only the documented low-battery auto-end. Vigil
+// (amazingmachine.app/vigil, not runvigil.ai, an unrelated AI-security product with the same
+// name) added 2026-07-19 after the same verification pass: it is a general-purpose keep-awake
+// app with no AI-agent awareness, so it is not a source of the [VERIFY] markers above.
 export const COMPARISON_INTRO =
-  "Amphetamine is excellent and free, and it deserves its reputation. But like every mainstream keep-awake app it has no idea what your agents are doing. Two newer tools do: Adrafinil (free, macOS 26.4+ only) and Agent Caffeine ($9). Here is the honest picture, feature by feature, sources checked July 2026.";
+  "Amphetamine is excellent and free, and it deserves its reputation. But like every mainstream keep-awake app it has no idea what your agents are doing. Two newer tools do: Adrafinil (free, macOS 26.4+ only) and Agent Caffeine ($9). A third, Vigil (free, macOS 13+), does not detect agents either, but it goes further than Amphetamine on scheduling, profiles, and session history. Here is the honest picture, feature by feature, sources checked July 2026.";
 
 export const COMPARISON_COLS = [
   "CleanKey",
   "Amphetamine",
   "Adrafinil",
   "Agent Caffeine",
+  "Vigil",
 ];
 
 export const COMPARISON_ROWS: ComparisonRow[] = [
@@ -178,9 +182,13 @@ export const COMPARISON_ROWS: ComparisonRow[] = [
       "Free",
       "Free (MIT)",
       "$9 one-time",
+      "Free",
     ],
   },
-  { label: "macOS required", values: ["14+", "10.13+", "26.4+", "13+"] },
+  {
+    label: "macOS required",
+    values: ["14+", "10.13+", "26.4+", "13+", "13+"],
+  },
   {
     label: "Detects AI coding agents",
     values: [
@@ -188,6 +196,7 @@ export const COMPARISON_ROWS: ComparisonRow[] = [
       "No",
       "Yes (hooks + process fallback)",
       "Yes (process polling, 5 s)",
+      "No",
     ],
   },
   {
@@ -197,11 +206,12 @@ export const COMPARISON_ROWS: ComparisonRow[] = [
       "n/a",
       "9 hooks + custom via CLI",
       "40+ allowlist, editable",
+      "n/a",
     ],
   },
   {
     label: "Awake only while agents work",
-    values: ["Yes", "No", "Yes", "Yes"],
+    values: ["Yes", "No", "Yes", "Yes", "No"],
   },
   {
     label: "End-of-session action chain (notify, Shortcut, lock, sleep)",
@@ -210,11 +220,12 @@ export const COMPARISON_ROWS: ComparisonRow[] = [
       "No (AppleScript for external automation)",
       "No",
       "No",
+      "Partial (lock on end only)",
     ],
   },
   {
     label: "Agent notifications (idle / unexpected end / long-run)",
-    values: ["Yes", "No", "No", "No"],
+    values: ["Yes", "No", "No", "No", "No"],
   },
   {
     label: "Clamshell: lid closed, no external display",
@@ -223,13 +234,23 @@ export const COMPARISON_ROWS: ComparisonRow[] = [
       "Partial (separate Enhancer app)",
       "Yes",
       "Partial (one-time sudo setup on battery)",
+      "Partial (AC power only)",
     ],
   },
   {
     label: "Lid-close chime + pre-sleep sounds",
-    values: ["Yes (chime + 4 motifs)", "No", "Partial (chime)", "No"],
+    values: [
+      "Yes (chime + 4 motifs)",
+      "No",
+      "Partial (chime)",
+      "No",
+      "Partial (session start/end sound)",
+    ],
   },
-  { label: "Lid-open summary", values: ["Yes", "No", "Yes", "No"] },
+  {
+    label: "Lid-open summary",
+    values: ["Yes", "No", "Yes", "No", "No"],
+  },
   {
     label: "Thermal guard",
     values: [
@@ -237,18 +258,37 @@ export const COMPARISON_ROWS: ComparisonRow[] = [
       "No",
       "Partial (force-release)",
       "No",
+      "No",
     ],
   },
   {
     label: "Battery guards (cutoff %, only-while-charging)",
-    values: ["Yes (both)", "Partial (low-battery auto-end)", "No", "No"],
+    values: [
+      "Yes (both)",
+      "Partial (low-battery auto-end)",
+      "No",
+      "No",
+      "Partial (fixed 20% cutoff)",
+    ],
   },
   {
     label: "Native scheduling (one-shot + weekly)",
-    values: ["Yes", "Partial (clock-time triggers)", "No", "No"],
+    values: [
+      "Yes",
+      "Partial (clock-time triggers)",
+      "No",
+      "No",
+      "Yes (schedule + profiles)",
+    ],
   },
-  { label: "SSH-reachable CLI", values: ["Yes", "No", "Yes", "No"] },
-  { label: "MCP tool for agents", values: ["Yes", "No", "Yes", "No"] },
+  {
+    label: "SSH-reachable CLI",
+    values: ["Yes", "No", "Yes", "No", "Yes (Terminal, Shortcuts, CI)"],
+  },
+  {
+    label: "MCP tool for agents",
+    values: ["Yes", "No", "Yes", "No", "No"],
+  },
   {
     label: "Timed holds from the menu",
     values: [
@@ -256,25 +296,36 @@ export const COMPARISON_ROWS: ComparisonRow[] = [
       "Yes (durations)",
       "Yes (time-boxed)",
       "No",
+      "Yes (5 min to 4h + custom, countdown)",
     ],
   },
   {
     label: "Session history, metrics, billing, token cost",
-    values: ["Yes", "No", "No", "Partial (reads Claude session files)"],
+    values: [
+      "Yes",
+      "No",
+      "No",
+      "Partial (reads Claude session files)",
+      "Partial (last 100 sessions, weekly total)",
+    ],
   },
-  { label: "In-app alerts log", values: ["Yes", "No", "No", "No"] },
+  {
+    label: "In-app alerts log",
+    values: ["Yes", "No", "No", "No", "No"],
+  },
   {
     label: "Keyboard/trackpad cleaning lock",
-    values: ["Yes (free)", "No", "No", "No"],
+    values: ["Yes (free)", "No", "No", "No", "No"],
   },
 ];
 
-// The mainstream field in one line, and the honest CleanKey-only set among the four apps
+// The mainstream field in one line, and the honest CleanKey-only set among the five apps
 // above. Clamshell, lid-open summary, CLI, and MCP are NOT in this list on purpose:
-// Adrafinil has all four since v1.5.1.
+// Adrafinil has all four since v1.5.1. Native scheduling is out too: Vigil has it (schedule +
+// profiles), just without AI-agent awareness.
 export const COMPARISON_FOOTNOTES: string[] = [
   "The mainstream field, briefly: KeepingYouAwake (free, MIT), Caffeinated ($3.99), and Lungo ($4) are manual on/off tools. None of the three detects agents, schedules natively, runs end-of-session actions, or supports a closed lid without an external display.",
-  "Where CleanKey stands alone in this table: native scheduling, end-of-session chains, battery guards, the agent notifications suite, the dashboard with billing and token cost, the alerts log, a thermal guard that pauses and resumes, macOS 14+ reach, and the free cleaning lock.",
+  "Where CleanKey stands alone in this table: end-of-session action chains, the agent notifications suite, the dashboard with billing and token cost, an alerts log tied to AI-agent events, a thermal guard that pauses and resumes, configurable battery guards (cutoff percentage and only-while-charging, not a fixed threshold), and the free cleaning lock.",
 ];
 
 export const USE_CASES: UseCase[] = [
