@@ -1,10 +1,10 @@
 ---
 import { Image } from 'astro:assets';
 import ProductPage from '../layouts/ProductPage.astro';
-import CtaRow from '../components/cleankey/CtaRow.astro';
-import PriceBanner from '../components/cleankey/PriceBanner.astro';
+import CtaRow from '../components/agentwake/CtaRow.astro';
+import PriceBanner from '../components/agentwake/PriceBanner.astro';
 import { resolveAppcast } from '../data/appcast';
-import ogImage from '../assets/cleankey/og.png';
+import ogImage from '../assets/agentwake/og.png';
 import {
 	HERO,
 	META_DESCRIPTION,
@@ -25,17 +25,17 @@ import {
 	FOOTER_LINKS,
 	SHOT_LIST,
 	POLAR_CHECKOUT_URL,
-} from '../data/cleankey';
+} from '../data/agentwake';
 import { PRICING } from '../data/pricing';
 
 const hasPolar = POLAR_CHECKOUT_URL !== '';
 const { version } = await resolveAppcast();
 const chips = [`v${version} · ${HERO.chips[0]}`, ...HERO.chips.slice(1)];
 
-// Real screenshots live in src/assets/cleankey/. Match SHOT_LIST entries by filename so the
+// Real screenshots live in src/assets/agentwake/. Match SHOT_LIST entries by filename so the
 // JSON-LD screenshot array and the inline shots pick up new captures automatically.
 const shotModules = import.meta.glob<{ default: ImageMetadata }>(
-	'../assets/cleankey/*.{png,jpg,jpeg,webp,gif}',
+	'../assets/agentwake/*.{png,jpg,jpeg,webp,gif}',
 	{ eager: true },
 );
 const shotImages: Record<string, ImageMetadata> = {};
@@ -97,18 +97,18 @@ const ogImageURL = new URL(ogImage.src, SITE).toString();
 const appLd = {
 	'@context': 'https://schema.org',
 	'@type': 'SoftwareApplication',
-	name: 'CleanKey',
+	name: 'Agentwake',
 	applicationCategory: 'UtilitiesApplication',
 	operatingSystem: 'macOS 14.0 or later',
 	description: META_DESCRIPTION,
-	url: new URL('/cleankey', SITE).toString(),
+	url: new URL('/agentwake', SITE).toString(),
 	image: ogImageURL,
 	screenshot: SHOT_LIST.slice(1).flatMap((s) => {
 		const img = shotImages[s.key];
 		return img ? [new URL(img.src, SITE).toString()] : [];
 	}),
 	softwareVersion: version,
-	downloadUrl: new URL('/cleankey/download', SITE).toString(),
+	downloadUrl: new URL('/agentwake/download', SITE).toString(),
 	author: { '@type': 'Person', name: 'Stefano Ferri', url: SITE.toString() },
 	offers: [
 		{
@@ -116,7 +116,7 @@ const appLd = {
 			name: 'Free',
 			price: '0',
 			priceCurrency: 'EUR',
-			url: new URL('/cleankey/download', SITE).toString(),
+			url: new URL('/agentwake/download', SITE).toString(),
 		},
 		{
 			'@type': 'Offer',
@@ -142,20 +142,20 @@ const breadcrumbLd = {
 	'@type': 'BreadcrumbList',
 	itemListElement: [
 		{ '@type': 'ListItem', position: 1, name: 'istefox.dev', item: SITE.toString() },
-		{ '@type': 'ListItem', position: 2, name: 'CleanKey', item: new URL('/cleankey', SITE).toString() },
+		{ '@type': 'ListItem', position: 2, name: 'Agentwake', item: new URL('/agentwake', SITE).toString() },
 	],
 };
 ---
 
 <ProductPage
-	title="CleanKey for macOS: keep your Mac awake for AI agents"
+	title="Agentwake for macOS: keep your Mac awake for AI agents"
 	description={META_DESCRIPTION}
-	productName="CleanKey"
+	productName="Agentwake"
 	image={ogImage}
-	imageAlt="CleanKey knows when your unattended work is done"
+	imageAlt="Agentwake knows when your unattended work is done"
 >
 	<Fragment slot="head">
-		<link rel="preload" as="image" href="/cleankey/hero-ai-coding-mode-poster.jpg" fetchpriority="high" />
+		<link rel="preload" as="image" href="/agentwake/hero-ai-coding-mode-poster.jpg" fetchpriority="high" />
 		<script type="application/ld+json" set:html={JSON.stringify(appLd)} />
 		<script type="application/ld+json" set:html={JSON.stringify(faqLd)} />
 		<script type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
@@ -193,11 +193,11 @@ const breadcrumbLd = {
 					loop
 					playsinline
 					preload="metadata"
-					poster="/cleankey/hero-ai-coding-mode-poster.jpg"
+					poster="/agentwake/hero-ai-coding-mode-poster.jpg"
 					aria-label={SHOT_LIST[0].caption}
 				>
-					<source src="/cleankey/hero-ai-coding-mode.webm" type="video/webm" />
-					<source src="/cleankey/hero-ai-coding-mode.mp4" type="video/mp4" />
+					<source src="/agentwake/hero-ai-coding-mode.webm" type="video/webm" />
+					<source src="/agentwake/hero-ai-coding-mode.mp4" type="video/mp4" />
 				</video>
 				<button id="video-toggle" class="video-toggle" type="button" data-state="playing" aria-label="Pause video">
 					<svg class="ic-pause" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 5v14M15 5v14" /></svg>
@@ -303,7 +303,7 @@ const breadcrumbLd = {
 		<h2><span class="h2ico" set:html={icon('trophy')} />The Amphetamine alternative for AI agents, compared honestly</h2>
 		<p>{COMPARISON_INTRO}</p>
 		<table class="cmp">
-			<caption class="sr-only">Feature comparison between CleanKey, Amphetamine, Adrafinil, Agent Caffeine, and Vigil</caption>
+			<caption class="sr-only">Feature comparison between Agentwake, Amphetamine, Adrafinil, Agent Caffeine, and Vigil</caption>
 			<thead>
 				<tr>
 					<th scope="col"><span class="sr-only">Feature</span></th>

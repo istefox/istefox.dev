@@ -1,9 +1,9 @@
 ---
 import ProductPage from '../../layouts/ProductPage.astro';
-import CtaRow from '../../components/cleankey/CtaRow.astro';
-import PriceBanner from '../../components/cleankey/PriceBanner.astro';
+import CtaRow from '../../components/agentwake/CtaRow.astro';
+import PriceBanner from '../../components/agentwake/PriceBanner.astro';
 import { resolveAppcast } from '../../data/appcast';
-import { POLAR_CHECKOUT_URL } from '../../data/cleankey';
+import { POLAR_CHECKOUT_URL } from '../../data/agentwake';
 
 const hasPolar = POLAR_CHECKOUT_URL !== '';
 
@@ -13,9 +13,9 @@ const { dmgUrl, version } = await resolveAppcast();
 ---
 
 <ProductPage
-	title={`Downloading CleanKey ${version}`}
-	description="Your CleanKey download is starting."
-	productName="CleanKey"
+	title={`Downloading Agentwake ${version}`}
+	description="Your Agentwake download is starting."
+	productName="Agentwake"
 >
 	<Fragment slot="head">
 		<meta name="robots" content="noindex" />
@@ -37,13 +37,13 @@ const { dmgUrl, version } = await resolveAppcast();
 	<section class="dl">
 		<div class="spinner" aria-hidden="true"></div>
 		<h1>Your download is starting</h1>
-		<p class="lead">CleanKey {version} for macOS should begin downloading in a moment.</p>
+		<p class="lead">Agentwake {version} for macOS should begin downloading in a moment.</p>
 		<p class="fallback">
-			If it does not start, <a id="dmg" href={dmgUrl} download>download CleanKey {version}</a>.
+			If it does not start, <a id="dmg" href={dmgUrl} download>download Agentwake {version}</a>.
 		</p>
 
 		<ol class="steps">
-			<li>Open the DMG and drag CleanKey to your Applications folder.</li>
+			<li>Open the DMG and drag Agentwake to your Applications folder.</li>
 			<li>Launch it from Applications. The icon appears in the menu bar.</li>
 			<li>On first run, grant Accessibility so the lock can block the keyboard and trackpad.</li>
 		</ol>
@@ -54,7 +54,7 @@ const { dmgUrl, version } = await resolveAppcast();
 		</p>
 
 		<CtaRow showDownload={false} proVariant="solid">
-			<a class="btn btn-ghost" href="/cleankey">Back to CleanKey</a>
+			<a class="btn btn-ghost" href="/agentwake">Back to Agentwake</a>
 		</CtaRow>
 	</section>
 </ProductPage>
