@@ -1,7 +1,9 @@
-// Structured content for the CleanKey product landing page (/cleankey), in English.
-// Source of truth: docs/marketing/website-refactor-handoff-2026-07-18.md in the CleanKey repo
-// (verified against v1.16.1). Kept data-driven so copy is easy to edit and translate.
+// Structured content for the Agentwake product landing page (/agentwake), in English.
+// Source of truth: docs/marketing/website-refactor-handoff-2026-07-18.md in the Agentwake app
+// repo (verified against v1.16.1). Kept data-driven so copy is easy to edit and translate.
 // Every price on the page comes from the launch ladder in ./pricing — never hardcode one here.
+// The app was renamed CleanKey -> Agentwake on 2026-07-19 (ADR-028 in the app repo); this file
+// was updated the same day per website-rename-seo-handoff-2026-07-19.md.
 
 import { PRICING } from "./pricing";
 
@@ -12,7 +14,7 @@ export interface AutomationAction {
 
 export interface ComparisonRow {
   label: string;
-  // order: CleanKey, Amphetamine, Adrafinil, Agent Caffeine
+  // order: Agentwake, Amphetamine, Adrafinil, Agent Caffeine, Vigil
   values: string[];
 }
 
@@ -32,7 +34,7 @@ export interface FooterLink {
 }
 
 export interface Shot {
-  // Filename under src/assets/cleankey/ (matched by import.meta.glob). Rendered as a placeholder
+  // Filename under src/assets/agentwake/ (matched by import.meta.glob). Rendered as a placeholder
   // until the real asset exists. `title`/`desc` add a caption under the shot.
   key: string;
   caption: string;
@@ -41,8 +43,8 @@ export interface Shot {
 }
 
 export const HERO = {
-  headline: "CleanKey knows when your unattended work is done.",
-  // Doubles as the self-contained "what is CleanKey" answer block for AI search (40–60 words).
+  headline: "Agentwake knows when your unattended work is done.",
+  // Doubles as the self-contained "what is Agentwake" answer block for AI search (40–60 words).
   subhead:
     "It watches your AI coding agents, Claude Code, Cursor, Codex, Gemini and more, and keeps your Mac awake, lid closed if you want, only while they are working. The moment the last one finishes it can notify you, run your Shortcut, and put the Mac to sleep. And it locks your keyboard so you can clean it. That part is free.",
   // Trust chips under the CTAs. Kept short: each one answers a purchase objection.
@@ -57,7 +59,7 @@ export const HERO = {
 
 // Used for <meta description> and OG. Keep ≤160 chars so search results show it uncut.
 export const META_DESCRIPTION =
-  "CleanKey keeps your Mac awake while AI coding agents like Claude Code work, lid closed if you want, then lets it sleep when they finish. The cleaning lock is free.";
+  "Agentwake keeps your Mac awake while AI coding agents like Claude Code work, lid closed if you want, then lets it sleep when they finish. The cleaning lock is free.";
 
 // The pain, three lines. Verbatim from the handoff.
 export const PAIN = {
@@ -70,14 +72,14 @@ export const PAIN = {
 export const HOW_IT_KNOWS = {
   title: "How it knows: hooks, a process fallback, and a fail-safe",
   body: [
-    "CleanKey installs a tiny activity hook into each coding tool with one click (nine tools built in, custom agents supported), and falls back to process detection for tools without hooks. Every session reports a heartbeat; when the last one goes quiet, the work is done. The design is fail-safe: a missed signal lets the Mac sleep. It never gets stuck awake.",
+    "Agentwake installs a tiny activity hook into each coding tool with one click (nine tools built in, custom agents supported), and falls back to process detection for tools without hooks. Every session reports a heartbeat; when the last one goes quiet, the work is done. The design is fail-safe: a missed signal lets the Mac sleep. It never gets stuck awake.",
     "Prefer to wire it yourself? This is the whole hook, ready to paste into Claude Code’s ~/.claude/settings.json. After an app update the installed hook refreshes itself, so it always matches the current version:",
   ],
   hookJson: `{
   "hooks": {
-    "PostToolUse":      [{ "matcher": ".*", "hooks": [{ "type": "command", "command": "mkdir -p ~/.cleankey && touch ~/.cleankey/heartbeat", "async": true, "timeout": 1 }] }],
-    "UserPromptSubmit": [{ "hooks": [{ "type": "command", "command": "mkdir -p ~/.cleankey && touch ~/.cleankey/heartbeat", "async": true, "timeout": 1 }] }],
-    "SessionEnd":       [{ "hooks": [{ "type": "command", "command": "rm -f ~/.cleankey/heartbeat", "async": true, "timeout": 1 }] }]
+    "PostToolUse":      [{ "matcher": ".*", "hooks": [{ "type": "command", "command": "mkdir -p ~/.agentwake && touch ~/.agentwake/heartbeat", "async": true, "timeout": 1 }] }],
+    "UserPromptSubmit": [{ "hooks": [{ "type": "command", "command": "mkdir -p ~/.agentwake && touch ~/.agentwake/heartbeat", "async": true, "timeout": 1 }] }],
+    "SessionEnd":       [{ "hooks": [{ "type": "command", "command": "rm -f ~/.agentwake/heartbeat", "async": true, "timeout": 1 }] }]
   }
 }`,
 };
@@ -114,7 +116,7 @@ export const PRO_FEATURES_LIST: string[] = [
   "Dashboard History, Metrics, and Billing panes; per-project billable time with rounding rules and CSV export",
   "Consent-gated token-cost estimation for Claude Code sessions: usage and model fields only, never conversation content",
   "Retention controls: row cap and time window",
-  "cleankey CLI (hold, release, acquire, status), file-based and SSH-reachable, works with the app closed",
+  "agentwake CLI (hold, release, acquire, status), file-based and SSH-reachable, works with the app closed",
   "MCP server: hold, release, and status as agent-callable tools, one-click install into Claude Code",
   "Menu-bar quick holds from 15 minutes to until-stopped, with live remaining time",
 ];
@@ -123,11 +125,11 @@ export const PRO_FEATURES_LIST: string[] = [
 export const AUTOMATIONS = {
   title: "The finish line: what happens when the work ends",
   body: [
-    "Keep-awake gets your run to the end. End-of-session automations decide what happens the moment it stops: pick a trigger, pick the actions, and CleanKey runs them while you are away from the desk.",
-    "The flagship case: your agent goes idle for twenty minutes, CleanKey sends a notification, runs your cleanup Shortcut, and puts the Mac to sleep. You come back to finished work and a cool, sleeping machine.",
+    "Keep-awake gets your run to the end. End-of-session automations decide what happens the moment it stops: pick a trigger, pick the actions, and Agentwake runs them while you are away from the desk.",
+    "The flagship case: your agent goes idle for twenty minutes, Agentwake sends a notification, runs your cleanup Shortcut, and puts the Mac to sleep. You come back to finished work and a cool, sleeping machine.",
   ],
   triggers: [
-    "Your AI agent goes idle. The heartbeat goes stale past the timeout, so CleanKey treats the run as finished.",
+    "Your AI agent goes idle. The heartbeat goes stale past the timeout, so Agentwake treats the run as finished.",
     "The keep-awake cap expires. The maximum-duration timer you set runs out.",
     "A schedule window closes. A weekly or one-shot keep-awake window ends on its own.",
   ],
@@ -138,11 +140,11 @@ export const AUTOMATIONS = {
     },
     {
       name: "Run Shortcut",
-      body: "Run any macOS Shortcut by name. Commit, push, post to Slack, anything Shortcuts can do, with no extra permissions and no change to how CleanKey is signed.",
+      body: "Run any macOS Shortcut by name. Commit, push, post to Slack, anything Shortcuts can do, with no extra permissions and no change to how Agentwake is signed.",
     },
     {
       name: "Lock",
-      body: "Lock the keyboard and trackpad with CleanKey’s own lock, so nothing disturbs the Mac after the run.",
+      body: "Lock the keyboard and trackpad with Agentwake’s own lock, so nothing disturbs the Mac after the run.",
     },
     {
       name: "Sleep",
@@ -162,10 +164,10 @@ export const AUTOMATIONS = {
 // name) added 2026-07-19 after the same verification pass: it is a general-purpose keep-awake
 // app with no AI-agent awareness, so it is not a source of the [VERIFY] markers above.
 export const COMPARISON_INTRO =
-  "Amphetamine is excellent and free, and it deserves its reputation. But like every mainstream keep-awake app it has no idea what your agents are doing. Two newer tools do: Adrafinil (free, macOS 26.4+ only) and Agent Caffeine ($9). A third, Vigil (free, macOS 13+), does not detect agents either, but it goes further than Amphetamine on scheduling, profiles, and session history. Here is the honest picture, feature by feature, sources checked July 2026.";
+  "Amphetamine is excellent and free, and it deserves its reputation. But like every mainstream keep-awake app it has no idea what your agents are doing. Two newer tools do: Adrafinil (free, macOS 26.4+ only) and Agent Caffeine ($9). A third, Vigil (free, macOS 13+), does not detect agents either, but it goes further than Amphetamine on scheduling, profiles, and session history. Here is the honest picture, feature by feature, sources checked July 2026. If you're looking at Agentwake as an Adrafinil alternative, an Agent Caffeine alternative, or a Vigil alternative, the table below has the facts, not the pitch.";
 
 export const COMPARISON_COLS = [
-  "CleanKey",
+  "Agentwake",
   "Amphetamine",
   "Adrafinil",
   "Agent Caffeine",
@@ -319,19 +321,19 @@ export const COMPARISON_ROWS: ComparisonRow[] = [
   },
 ];
 
-// The mainstream field in one line, and the honest CleanKey-only set among the five apps
+// The mainstream field in one line, and the honest Agentwake-only set among the five apps
 // above. Clamshell, lid-open summary, CLI, and MCP are NOT in this list on purpose:
 // Adrafinil has all four since v1.5.1. Native scheduling is out too: Vigil has it (schedule +
 // profiles), just without AI-agent awareness.
 export const COMPARISON_FOOTNOTES: string[] = [
   "The mainstream field, briefly: KeepingYouAwake (free, MIT), Caffeinated ($3.99), and Lungo ($4) are manual on/off tools. None of the three detects agents, schedules natively, runs end-of-session actions, or supports a closed lid without an external display.",
-  "Where CleanKey stands alone in this table: end-of-session action chains, the agent notifications suite, the dashboard with billing and token cost, an alerts log tied to AI-agent events, a thermal guard that pauses and resumes, configurable battery guards (cutoff percentage and only-while-charging, not a fixed threshold), and the free cleaning lock.",
+  "Where Agentwake stands alone in this table: end-of-session action chains, the agent notifications suite, the dashboard with billing and token cost, an alerts log tied to AI-agent events, a thermal guard that pauses and resumes, configurable battery guards (cutoff percentage and only-while-charging, not a fixed threshold), and the free cleaning lock.",
 ];
 
 export const USE_CASES: UseCase[] = [
   {
     title: "Agents overnight",
-    body: "Start Claude Code or Codex before bed and close the lid. CleanKey holds the Mac awake exactly as long as the run lasts, then notifies you, runs your Shortcut, and lets it sleep.",
+    body: "Start Claude Code or Codex before bed and close the lid. Agentwake holds the Mac awake exactly as long as the run lasts, then notifies you, runs your Shortcut, and lets it sleep.",
   },
   {
     title: "Renders and backups",
@@ -349,7 +351,7 @@ export const USE_CASES: UseCase[] = [
 
 // Pricing section. The ladder sentence and prices come from ./pricing.
 export const PRICING_COPY = {
-  title: "Get CleanKey",
+  title: "Get Agentwake",
   freeName: "Free",
   freeBody:
     "The whole lock, the live agent status, the hook installer, process detection, and the dashboard’s live view.",
@@ -360,19 +362,21 @@ export const PRICING_COPY = {
 };
 
 // FAQ. The first eight are verbatim from the handoff (the trust floor: permissions,
-// stuck-awake risk, privacy, why not MAS); the last four cover the practical questions
-// buyers actually send. Phrased the way people type them into a search box.
+// stuck-awake risk, privacy, why not MAS); the next covers Agent Caffeine and Vigil together
+// (added 2026-07-19, per the rename handoff's target-phrase instruction — one combined entry
+// rather than two near-duplicates, since neither had a dedicated question before); the last
+// four cover the practical questions buyers actually send. Phrased the way people type them.
 export const FAQ: FaqItem[] = [
   {
     q: "Does it really keep the Mac awake with the lid closed?",
-    a: "Yes, with no external display, through a privileged helper you approve on first use. The helper holds a lease that the app renews every few seconds; if CleanKey ever crashes, the lease expires and the Mac sleeps normally. It cannot get stuck awake.",
+    a: "Yes, with no external display, through a privileged helper you approve on first use. The helper holds a lease that the app renews every few seconds; if Agentwake ever crashes, the lease expires and the Mac sleeps normally. It cannot get stuck awake.",
   },
   {
-    q: "Why does CleanKey need the Accessibility permission?",
+    q: "Why does Agentwake need the Accessibility permission?",
     a: "The keyboard lock swallows input events system-wide, which macOS only allows to apps you trust in System Settings, Privacy & Security, Accessibility. The keep-awake side does not use it.",
   },
   {
-    q: "Does CleanKey read my code or my conversations?",
+    q: "Does Agentwake read my code or my conversations?",
     a: "No. The agent hooks report only 'this session is alive' heartbeats. The optional token-cost estimate reads usage and model fields from local Claude Code session files, only after you opt in, and never the conversation content. There is no telemetry.",
   },
   {
@@ -381,15 +385,19 @@ export const FAQ: FaqItem[] = [
   },
   {
     q: "How is this different from Amphetamine?",
-    a: "Amphetamine starts and stops awake sessions on triggers like time, app, or battery. It cannot tell whether your agents are working, and it cannot run actions when the work ends. CleanKey does both.",
+    a: "Amphetamine starts and stops awake sessions on triggers like time, app, or battery. It cannot tell whether your agents are working, and it cannot run actions when the work ends. Agentwake does both.",
   },
   {
-    q: "Adrafinil is free. Why pay for CleanKey?",
-    a: "Adrafinil covers keep-awake for agents and requires macOS 26.4. CleanKey runs on macOS 14+, adds weekly schedules, battery guards, agent notifications, end-of-session action chains, a session dashboard with billable time and token costs, and the keyboard-cleaning lock. If Adrafinil covers your need, use it; it is good software.",
+    q: "Adrafinil is free. Why pay for Agentwake?",
+    a: "Adrafinil covers keep-awake for agents and requires macOS 26.4. Agentwake runs on macOS 14+, adds weekly schedules, battery guards, agent notifications, end-of-session action chains, a session dashboard with billable time and token costs, and the keyboard-cleaning lock. If Adrafinil covers your need, use it; it is good software.",
   },
   {
-    q: "Why is CleanKey not on the Mac App Store?",
-    a: "The App Store sandbox forbids the two things CleanKey exists to do: suppressing input events and installing the lid-closed helper. The DMG is signed and notarized by Apple's process, and Sparkle keeps it updated.",
+    q: "How does Agentwake compare to Agent Caffeine or Vigil?",
+    a: "Agent Caffeine ($9) detects agents by polling the process list every five seconds; Vigil (free) doesn't detect agents at all, its triggers are generic process, CPU, and network activity you configure by hand. Agentwake's hooks report a real per-session heartbeat, so it knows precisely when an agent is working, not just when some process is running.",
+  },
+  {
+    q: "Why is Agentwake not on the Mac App Store?",
+    a: "The App Store sandbox forbids the two things Agentwake exists to do: suppressing input events and installing the lid-closed helper. The DMG is signed and notarized by Apple's process, and Sparkle keeps it updated.",
   },
   {
     q: "What exactly is free?",
@@ -414,16 +422,17 @@ export const FAQ: FaqItem[] = [
 ];
 
 // Footer. The source repo is private, so GitHub links point at the public releases repo
-// (signed DMGs + changelog); no source-repo link is exposed.
+// (signed DMGs + changelog); no source-repo link is exposed. The last sentence is the one
+// required brand-continuity line for anyone who bookmarked or searches the old name.
 export const FOOTER_PRIVACY =
-  "No telemetry. The only network calls CleanKey makes are Sparkle update checks, license validation, and the pricing-table refresh you trigger yourself.";
+  "No telemetry. The only network calls Agentwake makes are Sparkle update checks, license validation, and the pricing-table refresh you trigger yourself. Agentwake was formerly known as CleanKey.";
 
 export const FOOTER_LINKS: FooterLink[] = [
   {
     label: "Releases and changelog",
-    href: "https://github.com/istefox/CleanKey-releases/releases",
+    href: "https://github.com/istefox/Agentwake-releases/releases",
   },
-  { label: "Download", href: "/cleankey/download" },
+  { label: "Download", href: "/agentwake/download" },
   { label: "Contact", href: "mailto:stefferri@icloud.com" },
   { label: "GitHub Sponsors", href: "https://github.com/sponsors/istefox" },
   { label: "Ko-fi", href: "https://ko-fi.com/stefox" },
@@ -433,7 +442,7 @@ export const SHOT_LIST: Shot[] = [
   // index 0 is the hero (rendered as a <video>, not inline).
   {
     key: "hero-ai-coding-mode.gif",
-    caption: "CleanKey knows when your unattended work is done.",
+    caption: "Agentwake knows when your unattended work is done.",
   },
   {
     key: "keep-awake-pane.png",
@@ -445,7 +454,7 @@ export const SHOT_LIST: Shot[] = [
     key: "ai-coding-mode.png",
     caption: "AI coding mode",
     title: "AI coding mode",
-    desc: "Stay awake while Claude Code or Codex works, then sleep after it goes idle. One paste wires the hook, and CleanKey detects the tool.",
+    desc: "Stay awake while Claude Code or Codex works, then sleep after it goes idle. One paste wires the hook, and Agentwake detects the tool.",
   },
   {
     key: "battery-thermal.png",
@@ -475,7 +484,7 @@ export const SHOT_LIST: Shot[] = [
     key: "alerts-center.png",
     caption: "Alerts log",
     title: "Alerts log",
-    desc: "CleanKey logs every automatic state change, so you always see why keep-awake released or a session ended.",
+    desc: "Agentwake logs every automatic state change, so you always see why keep-awake released or a session ended.",
   },
   {
     key: "menu-bar-states.png",
@@ -487,14 +496,15 @@ export const SHOT_LIST: Shot[] = [
 
 // Distribution + purchase.
 // The "Download free" CTA points at the in-site download page, which resolves the current DMG from
-// the Sparkle appcast at build time (see src/pages/cleankey/download.astro). No source-repo link is
-// exposed: the CleanKey code repo is private, only the signed DMG is distributed.
-export const DOWNLOAD_URL = "/cleankey/download";
+// the Sparkle appcast at build time (see src/pages/agentwake/download.astro). No source-repo link
+// is exposed: the Agentwake code repo is private, only the signed DMG is distributed.
+export const DOWNLOAD_URL = "/agentwake/download";
 
 // The Sparkle appcast resolver (latest DMG + version at build time) lives in src/data/appcast.ts.
 
 // Polar embedded checkout. Set POLAR_CHECKOUT_URL to the product/checkout link; leave '' to render
 // the Buy-Pro CTA as "coming soon". The price shown anywhere on the site comes from ./pricing
 // (launch ladder); the product price in the Polar dashboard must be kept in step by hand.
+// Confirmed 2026-07-19: the Polar product was renamed in place, this URL is unchanged.
 export const POLAR_CHECKOUT_URL: string =
   "https://buy.polar.sh/polar_cl_PBbomGVla4ni0vXmxjgo5myXmxtWNqyRCb2Og4K4BvS";

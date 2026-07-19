@@ -1,5 +1,5 @@
-// CleanKey launch price ladder — the single source of truth for every price on the site.
-// Handoff: docs/marketing/website-refactor-handoff-2026-07-18.md (CleanKey repo), section 5.
+// Agentwake launch price ladder — the single source of truth for every price on the site.
+// Handoff: docs/marketing/website-refactor-handoff-2026-07-18.md (Agentwake app repo), section 5.
 //
 // The ladder: €4.99 from day 0 (public launch) for 14 days, €5.99 through day 42, then the
 // permanent €7.99 list price. Every date shown on the site is real and published in advance;

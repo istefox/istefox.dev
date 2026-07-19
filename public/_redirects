@@ -1,0 +1,5 @@
+# App renamed CleanKey -> Agentwake on 2026-07-19. Preserve ranking/backlinks on the old path.
+/cleankey/download/  /agentwake/download/  301
+/cleankey/download    /agentwake/download   301
+/cleankey/            /agentwake/           301
+/cleankey             /agentwake            301
