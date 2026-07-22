@@ -1,0 +1,179 @@
+---
+// Email capture for the pre-launch waitlist. Posts to the Cloudflare Pages Function at
+// /api/waitlist (functions/api/waitlist.ts): honeypot + Turnstile + KV storage server-side.
+// JS is required by Turnstile itself, so the no-JS path is a mailto fallback, not a plain POST.
+import { TURNSTILE_SITE_KEY, WAITLIST_FORM } from '../../data/agentwake-waitlist';
+---
+
+<form id="waitlist-form" method="post" action="/api/waitlist" novalidate>
+	<label for="wl-email">{WAITLIST_FORM.emailLabel}</label>
+	<div class="row">
+		<input
+			id="wl-email"
+			name="email"
+			type="email"
+			required
+			maxlength="254"
+			autocomplete="email"
+			placeholder={WAITLIST_FORM.emailPlaceholder}
+		/>
+		<button class="btn btn-primary" type="submit">{WAITLIST_FORM.submitLabel}</button>
+	</div>
+	{/* Honeypot: visually hidden rather than display:none — some bots skip hidden fields. */}
+	<div class="hp" aria-hidden="true">
+		<input name="website" type="text" tabindex="-1" autocomplete="off" />
+	</div>
+	<div class="cf-turnstile" data-sitekey={TURNSTILE_SITE_KEY} data-theme="auto"></div>
+	<p class="form-status" role="status" aria-live="polite"></p>
+	<p class="privacy">{WAITLIST_FORM.privacyNote}</p>
+</form>
+<noscript>
+	<p class="noscript-note">
+		The form needs JavaScript. Email
+		<a href="mailto:stefferri@icloud.com?subject=Agentwake%20waitlist">stefferri@icloud.com</a>
+		instead and you will be added by hand.
+	</p>
+</noscript>
+
+{/* No SRI on purpose, unlike the Polar embed: Turnstile's api.js is a rolling script that
+    Cloudflare updates server-side as the challenge platform evolves, so a pinned hash would
+    break the widget on their next release. Same first party that hosts the site. */}
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer is:inline></script>
+
+<script is:inline define:vars={{ messages: WAITLIST_FORM }}>
+	(() => {
+		const form = document.getElementById('waitlist-form');
+		if (!form) return;
+		const status = form.querySelector('.form-status');
+		const button = form.querySelector('button[type="submit"]');
+		const email = form.querySelector('#wl-email');
+		const setStatus = (text, isError) => {
+			if (!status) return;
+			status.textContent = text;
+			status.classList.toggle('error', Boolean(isError));
+		};
+		form.addEventListener('submit', async (event) => {
+			event.preventDefault();
+			if (!email.value || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.value.trim())) {
+				setStatus(messages.errorInvalidEmail, true);
+				email.focus();
+				return;
+			}
+			button.disabled = true;
+			setStatus('', false);
+			try {
+				const res = await fetch('/api/waitlist', { method: 'POST', body: new FormData(form) });
+				const data = await res.json().catch(() => null);
+				if (res.ok && data && data.ok) {
+					form.innerHTML = `<p class="success" role="status">${messages.successMessage}</p>`;
+					return;
+				}
+				const error = data && data.error;
+				setStatus(
+					error === 'invalid_email'
+						? messages.errorInvalidEmail
+						: error === 'turnstile'
+							? messages.errorTurnstile
+							: messages.errorNetwork,
+					true,
+				);
+			} catch {
+				setStatus(messages.errorNetwork, true);
+			} finally {
+				button.disabled = false;
+				// Turnstile tokens are single-use: reset so a corrected retry gets a fresh token.
+				if (window.turnstile) window.turnstile.reset();
+			}
+		});
+	})();
+</script>
+
+<style>
+	form {
+		max-width: 34rem;
+		margin: 0 auto;
+		text-align: left;
+	}
+	label {
+		display: block;
+		font-weight: 600;
+		margin-bottom: 0.4em;
+	}
+	.row {
+		display: flex;
+		gap: 0.6em;
+		flex-wrap: wrap;
+	}
+	input[type='email'] {
+		flex: 1 1 14rem;
+		padding: 0.6em 0.9em;
+		font: inherit;
+		color: rgb(var(--black));
+		background: rgb(var(--bg-elevated));
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: 8px;
+	}
+	input[type='email']:focus-visible {
+		outline: 2px solid var(--accent);
+		outline-offset: 2px;
+		border-color: var(--accent);
+	}
+	.btn-primary {
+		padding: 0.6em 1.3em;
+		font: inherit;
+		font-weight: 700;
+		color: #fff;
+		background: var(--accent);
+		border: 1px solid var(--accent);
+		border-radius: 8px;
+		cursor: pointer;
+	}
+	.btn-primary:hover {
+		filter: brightness(1.1);
+	}
+	.btn-primary:disabled {
+		opacity: 0.6;
+		cursor: wait;
+	}
+	.hp {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
+	}
+	.cf-turnstile {
+		margin-top: 0.9em;
+		min-height: 65px;
+	}
+	.form-status {
+		margin: 0.6em 0 0;
+		min-height: 1.4em;
+		font-size: 0.95em;
+	}
+	.form-status.error {
+		color: #c0392b;
+	}
+	:root[data-theme='dark'] .form-status.error {
+		color: #ff8a7a;
+	}
+	.privacy {
+		margin-top: 0.8em;
+		font-size: 0.85em;
+		color: rgb(var(--gray-dark));
+	}
+	.noscript-note {
+		max-width: 34rem;
+		margin: 1em auto 0;
+		text-align: center;
+		color: rgb(var(--gray-dark));
+	}
+	form :global(.success) {
+		font-size: 1.1em;
+		font-weight: 600;
+		color: var(--accent);
+		text-align: center;
+		padding: 1em 0;
+	}
+</style>

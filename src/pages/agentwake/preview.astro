@@ -1,10 +1,10 @@
 ---
 import { Image } from 'astro:assets';
-import ProductPage from '../layouts/ProductPage.astro';
-import CtaRow from '../components/agentwake/CtaRow.astro';
-import PriceBanner from '../components/agentwake/PriceBanner.astro';
-import { resolveAppcast } from '../data/appcast';
-import ogImage from '../assets/agentwake/og.png';
+import ProductPage from '../../layouts/ProductPage.astro';
+import CtaRow from '../../components/agentwake/CtaRow.astro';
+import PriceBanner from '../../components/agentwake/PriceBanner.astro';
+import { resolveAppcast } from '../../data/appcast';
+import ogImage from '../../assets/agentwake/og.png';
 import {
 	HERO,
 	META_DESCRIPTION,
@@ -25,8 +25,8 @@ import {
 	FOOTER_LINKS,
 	SHOT_LIST,
 	POLAR_CHECKOUT_URL,
-} from '../data/agentwake';
-import { PRICING } from '../data/pricing';
+} from '../../data/agentwake';
+import { PRICING } from '../../data/pricing';
 
 const hasPolar = POLAR_CHECKOUT_URL !== '';
 const { version } = await resolveAppcast();
@@ -35,7 +35,7 @@ const chips = [`v${version} · ${HERO.chips[0]}`, ...HERO.chips.slice(1)];
 // Real screenshots live in src/assets/agentwake/. Match SHOT_LIST entries by filename so the
 // JSON-LD screenshot array and the inline shots pick up new captures automatically.
 const shotModules = import.meta.glob<{ default: ImageMetadata }>(
-	'../assets/agentwake/*.{png,jpg,jpeg,webp,gif}',
+	'../../assets/agentwake/*.{png,jpg,jpeg,webp,gif}',
 	{ eager: true },
 );
 const shotImages: Record<string, ImageMetadata> = {};
@@ -153,8 +153,11 @@ const breadcrumbLd = {
 	productName="Agentwake"
 	image={ogImage}
 	imageAlt="Agentwake knows when your unattended work is done"
+	ctaHref="/agentwake/preview#get"
 >
 	<Fragment slot="head">
+		{/* Parked pre-launch: the full landing lives here unlinked while /agentwake runs the waitlist. */}
+		<meta name="robots" content="noindex, nofollow" />
 		<link rel="preload" as="image" href="/agentwake/hero-ai-coding-mode-poster.jpg" fetchpriority="high" />
 		<script type="application/ld+json" set:html={JSON.stringify(appLd)} />
 		<script type="application/ld+json" set:html={JSON.stringify(faqLd)} />
