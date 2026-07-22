@@ -11,9 +11,20 @@ interface Props {
 	/** Social-share image for the page; falls back to BaseHead's default. */
 	image?: ImageMetadata;
 	imageAlt?: string;
+	/** Header CTA target and label; default to the classic Get section on the landing. */
+	ctaHref?: string;
+	ctaLabel?: string;
 }
 
-const { title, description, productName, image, imageAlt } = Astro.props;
+const {
+	title,
+	description,
+	productName,
+	image,
+	imageAlt,
+	ctaHref = '/agentwake#get',
+	ctaLabel = 'Get it',
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -35,7 +46,7 @@ const { title, description, productName, image, imageAlt } = Astro.props;
 			<a class="wordmark" href="/agentwake">{productName}</a>
 			<nav class="product-nav">
 				<a href="/">istefox.dev</a>
-				<a href="/agentwake#get" class="get">Get it</a>
+				<a href={ctaHref} class="get">{ctaLabel}</a>
 				<ThemeToggle />
 			</nav>
 		</header>

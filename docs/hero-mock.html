@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>CleanKey — hero GIF mock</title>
+<title>Agentwake — hero GIF mock</title>
 <style>
 	/* Recording mock for hero-ai-coding-mode.gif. Not shipped (lives in docs/).
 	   Stage is a fixed 1280x800 (16:10) box; record just the stage.
@@ -71,31 +71,31 @@
 	.menubar .status .glyph { opacity: .8; }
 	.clock { font-variant-numeric: tabular-nums; }
 
-	/* ---- The real CleanKey icon (keyboard + quarter-sun) ---- */
-	.ck-icon { display: block; height: auto; }
-	.ck-icon .kb { color: currentColor; }
-	.ck-icon .moat { fill: var(--icon-bg, #14161e); stroke: var(--icon-bg, #14161e); }
-	.ck-icon .sun { fill: #fff; stroke: #fff; }
+	/* ---- The real Agentwake icon (keyboard + quarter-sun) ---- */
+	.aw-icon { display: block; height: auto; }
+	.aw-icon .kb { color: currentColor; }
+	.aw-icon .moat { fill: var(--icon-bg, #14161e); stroke: var(--icon-bg, #14161e); }
+	.aw-icon .sun { fill: #fff; stroke: #fff; }
 	/* keep-awake ON = sun visible; it fades out as keep-awake releases (asleep). */
 	.awake-badge { transition: opacity .6s ease; }
 	.stage[data-phase="sleeping"] .awake-badge,
 	.stage[data-phase="black"] .awake-badge { opacity: 0; }
 
-	.ck-mini {
+	.aw-mini {
 		--icon-bg: #171922;
 		display: inline-flex;
 		align-items: center;
 		color: #fff;
 	}
-	.ck-mini .ck-icon { width: 23px; }
+	.aw-mini .aw-icon { width: 23px; }
 
 	/* ---- Zoom inset: a faithful magnification of the real icon ---- */
-	.ck-zoom {
+	.aw-zoom {
 		position: absolute;
 		top: 46px; right: 30px;
 		z-index: 6;
 	}
-	.ck-zoom::before {
+	.aw-zoom::before {
 		content: "";
 		position: absolute;
 		top: -7px; right: 40px;
@@ -117,7 +117,7 @@
 		border: 1px solid rgba(255,255,255,.12);
 		box-shadow: 0 18px 50px rgba(0,0,0,.45);
 	}
-	.tile .ck-icon { width: 68px; }
+	.tile .aw-icon { width: 68px; }
 	/* soft attention pulse; stops once the Mac sleeps */
 	.tile::after {
 		content: "";
@@ -268,18 +268,18 @@
 			<div class="desktop"></div>
 
 			<div class="menubar">
-				<span class="brand">CleanKey</span>
+				<span class="brand">Agentwake</span>
 				<span class="menus"><span>File</span><span>Edit</span><span>View</span><span>Window</span></span>
 				<span class="spacer"></span>
 				<span class="status">
 					<span class="glyph">􀙇</span>
-					<span class="ck-mini" id="ck-mini" title="CleanKey — keep awake on"></span>
+					<span class="aw-mini" id="aw-mini" title="Agentwake — keep awake on"></span>
 					<span class="clock" id="clock">02:14</span>
 				</span>
 			</div>
 
-			<div class="ck-zoom" aria-hidden="true">
-				<div class="tile" id="ck-zoom"></div>
+			<div class="aw-zoom" aria-hidden="true">
+				<div class="tile" id="aw-zoom"></div>
 			</div>
 
 			<div class="window">
@@ -304,11 +304,11 @@
 	<div class="help" id="help">stage <b id="size">1280×800</b> (16:10) · R = record frame · Space = restart · H = hide this</div>
 
 <script>
-	// Faithful CleanKey icon: keyboard glyph + quarter-sun from the bottom-right
+	// Faithful Agentwake icon: keyboard glyph + quarter-sun from the bottom-right
 	// corner (the real keep-awake indicator). One source of truth, injected in both
 	// the menu bar and the zoom inset. The <g class="awake-badge"> is faded out on sleep.
 	const ICON = `
-	<svg viewBox="0 0 24 15" class="ck-icon" fill="none">
+	<svg viewBox="0 0 24 15" class="aw-icon" fill="none">
 		<g class="kb">
 			<rect x=".6" y=".6" width="22.8" height="13.8" rx="2.6" fill="none" stroke="currentColor" stroke-width="1.2"/>
 			<g fill="currentColor">
@@ -347,8 +347,8 @@
 			</g>
 		</g>
 	</svg>`;
-	document.getElementById('ck-mini').innerHTML = ICON;
-	document.getElementById('ck-zoom').innerHTML = ICON;
+	document.getElementById('aw-mini').innerHTML = ICON;
+	document.getElementById('aw-zoom').innerHTML = ICON;
 
 	const stage   = document.getElementById('stage');
 	const term    = document.getElementById('term');
@@ -360,7 +360,7 @@
 	const zzzEl   = document.querySelector('.zzz');
 	const awakeBadges = document.querySelectorAll('.awake-badge');
 
-	// Fake, clean agent session (CleanKey internals — on brand).
+	// Fake, clean agent session (Agentwake internals — on brand).
 	const LINES = [
 		{ c: 'prompt', t: '> refactor the keep-awake engine to async/await and add tests' },
 		{ c: 'tool',   t: '● Read  KeepAwakeManager.swift' },

@@ -7,7 +7,13 @@ import { defineConfig, fontProviders } from 'astro/config';
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://istefox.dev',
-	integrations: [mdx(), sitemap()],
+	integrations: [
+		mdx(),
+		sitemap({
+			// The parked landing preview and the noindex download page must not leak into the sitemap.
+			filter: (page) => !page.includes('/agentwake/preview') && !page.includes('/agentwake/download'),
+		}),
+	],
 	fonts: [
 		{
 			provider: fontProviders.local(),

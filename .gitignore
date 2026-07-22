@@ -28,3 +28,6 @@ pnpm-debug.log*
 docs/manifests/
 SPEC.md
 PROJECT_BRIEF.md
+
+# wrangler local dev state (npx wrangler pages dev)
+.wrangler/

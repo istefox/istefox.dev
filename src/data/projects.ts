@@ -26,7 +26,7 @@ export const projects: Project[] = [
   {
     name: "Agentwake",
     description:
-      "App menu-bar per macOS (Swift): blocca tastiera e trackpad per pulirli e tiene il Mac sveglio mentre il tuo agente AI programma.",
+      "App menu-bar per macOS (Swift): blocca tastiera e trackpad per pulirli e tiene il Mac sveglio mentre il tuo agente AI programma. In arrivo, waitlist aperta.",
     url: "/agentwake",
     featured: true,
   },
