@@ -100,5 +100,4 @@ export const WAITLIST_FORM = {
 
 // Cloudflare Turnstile site key — public by design, safe to commit. The matching secret
 // lives only in the Cloudflare Pages project settings (TURNSTILE_SECRET).
-// TODO: replace with the real site key from the Cloudflare dashboard (Turnstile → agentwake-waitlist).
-export const TURNSTILE_SITE_KEY = "1x00000000000000000000AA";
+export const TURNSTILE_SITE_KEY = "0x4AAAAAAD7h_iCKEeaHy6bQ";
