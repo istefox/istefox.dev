@@ -1,7 +1,8 @@
-// Cloudflare Pages Function: POST /api/waitlist — Agentwake pre-launch email capture.
+// Cloudflare Pages Function: POST /api/waitlist — Agentwake beta signup + invite email.
 // Bindings (configured in the Pages project dashboard, Production AND Preview):
 //   WAITLIST         → KV namespace "agentwake-waitlist"
 //   TURNSTILE_SECRET → Turnstile secret key (environment variable, type Secret)
+//   RESEND_API_KEY   → Resend API key (environment variable, type Secret)
 // Export at launch needs no code: keys ARE the emails —
 //   npx wrangler kv key list --namespace-id=<ID> --remote
 //
@@ -15,6 +16,72 @@ interface KVNamespace {
 interface Env {
   WAITLIST: KVNamespace;
   TURNSTILE_SECRET: string;
+  RESEND_API_KEY: string;
+}
+
+// Beta invite email, sent once per genuinely new signup (see the KV-guarded branch below).
+// The Polar checkout link carries a 100%-off, no-code discount capped at 100 redemptions,
+// expiring 2026-08-31 (see memory: agentwake_beta_checkout.md) — private on purpose, never
+// put on the public site, only delivered here by email.
+const BETA_EMAIL_FROM = "Agentwake <beta@istefox.dev>";
+// istefox.dev has no mail receiving set up (Enable Receiving is off in Resend, no MX for
+// inbound), so replies must route to the real support inbox already used site-wide, not to
+// BETA_EMAIL_FROM, which would bounce.
+const BETA_EMAIL_REPLY_TO = "stefferri@icloud.com";
+const BETA_EMAIL_SUBJECT = "Your Agentwake beta build is ready";
+const BETA_CHECKOUT_URL =
+  "https://buy.polar.sh/polar_cl_iUIyoNpKB839F0hFDj6TTYxfOnL1z0VZ0J8Mw0dvUVx";
+const BETA_DOWNLOAD_URL = "https://istefox.dev/agentwake/download";
+const BETA_ISSUES_URL =
+  "https://github.com/istefox/Agentwake-releases/issues/new";
+
+const betaEmailText = `Thanks for signing up for the Agentwake beta.
+
+Agentwake keeps your Mac awake while AI coding agents like Claude Code work, then lets it sleep the moment they finish.
+
+Download it here: ${BETA_DOWNLOAD_URL}
+
+As a beta tester you get Pro free. Use this link to activate it, it's tied to your signup and works once: ${BETA_CHECKOUT_URL}
+
+This is pre-release software, so expect rough edges. Found a bug, or have an idea for a feature or a change? Open an issue here: ${BETA_ISSUES_URL}
+
+Prefer email? Just reply to this one, I read every message myself.
+
+Stefano`;
+
+const betaEmailHtml = `<p>Thanks for signing up for the Agentwake beta.</p>
+<p>Agentwake keeps your Mac awake while AI coding agents like Claude Code work, then lets it sleep the moment they finish.</p>
+<p><a href="${BETA_DOWNLOAD_URL}">Download it here</a>.</p>
+<p>As a beta tester you get Pro free. <a href="${BETA_CHECKOUT_URL}">Use this link to activate it</a>, it's tied to your signup and works once.</p>
+<p>This is pre-release software, so expect rough edges. Found a bug, or have an idea for a feature or a change? <a href="${BETA_ISSUES_URL}">Open an issue here</a>.</p>
+<p>Prefer email? Just reply to this one, I read every message myself.</p>
+<p>Stefano</p>`;
+
+async function sendBetaEmail(
+  env: Env,
+  to: string,
+): Promise<{ sent: true } | { sent: false; error: string }> {
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${env.RESEND_API_KEY}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        from: BETA_EMAIL_FROM,
+        to,
+        reply_to: BETA_EMAIL_REPLY_TO,
+        subject: BETA_EMAIL_SUBJECT,
+        text: betaEmailText,
+        html: betaEmailHtml,
+      }),
+    });
+    if (!res.ok) return { sent: false, error: `resend_${res.status}` };
+    return { sent: true };
+  } catch {
+    return { sent: false, error: "resend_fetch_failed" };
+  }
 }
 
 const json = (body: unknown, status = 200): Response =>
@@ -78,12 +145,18 @@ export async function onRequestPost(ctx: {
   // eventually consistent and unfit for counters; Turnstile is the throttle.
   const key = `email:${email}`;
   if ((await env.WAITLIST.get(key)) === null) {
+    // Fail-open: a Resend outage must never turn a successful signup into an error response.
+    // emailSent/emailError let a manual `wrangler kv key list` audit spot anyone who needs a
+    // hand-sent follow-up, same fallback already used to check signups today.
+    const result = await sendBetaEmail(env, email);
     await env.WAITLIST.put(
       key,
       JSON.stringify({
         ts: new Date().toISOString(),
         ua: request.headers.get("user-agent") ?? undefined,
         ref: request.headers.get("referer") ?? undefined,
+        emailSent: result.sent,
+        ...(result.sent ? {} : { emailError: result.error }),
       }),
     );
   }
