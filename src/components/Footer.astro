@@ -10,6 +10,15 @@ const today = new Date();
 		<a href={`mailto:${CONTACTS.email}`}>Email</a>
 		<a href={CONTACTS.company} target="_blank" rel="noopener noreferrer">Vibrofer</a>
 	</div>
+	<div class="legal-links">
+		<a href="/terms">Terms &amp; Conditions</a>
+		<a href="/privacy">Privacy Policy</a>
+	</div>
+	<p class="made-in">
+		Made in Italy with
+		<svg class="heart" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.5-4.9-10-9.5C.3 8.4 2 4.5 5.7 4.1 8 3.8 9.9 5 12 7.2 14.1 5 16 3.8 18.3 4.1 22 4.5 23.7 8.4 22 11.5 19.5 16.1 12 21 12 21z"/></svg>
+		love
+	</p>
 	<p class="copyright">&copy; {today.getFullYear()} Stefano Ferri</p>
 </footer>
 <style>
@@ -32,6 +41,31 @@ const today = new Date();
 	}
 	.contacts a:hover {
 		color: var(--accent);
+	}
+	.legal-links {
+		display: flex;
+		justify-content: center;
+		flex-wrap: wrap;
+		gap: 1.25em;
+		margin-bottom: 0.75em;
+		font-size: 0.9em;
+	}
+	.legal-links a {
+		color: rgb(var(--gray-dark));
+		text-decoration: none;
+	}
+	.legal-links a:hover {
+		color: var(--accent);
+	}
+	.made-in {
+		margin: 0 0 0.35em;
+		font-size: 0.9em;
+	}
+	.heart {
+		width: 0.9em;
+		height: 0.9em;
+		vertical-align: -0.1em;
+		color: #be1622;
 	}
 	.copyright {
 		margin: 0;

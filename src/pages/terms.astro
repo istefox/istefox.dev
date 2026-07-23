@@ -1,0 +1,175 @@
+---
+// Terms & Conditions for istefox.dev and the Agentwake app. English text, Italian legal
+// framework (governing law and consumer rules). Facts sourced from the repo: pricing ladder
+// in src/data/pricing.ts, beta program in src/data/agentwake-waitlist.ts and
+// functions/api/waitlist.ts, refund and support policy in src/data/agentwake.ts (FAQ).
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_TITLE } from '../consts';
+
+const LAST_UPDATED = '23 July 2026';
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead
+			title={`Terms & Conditions — ${SITE_TITLE}`}
+			description="Terms and conditions for the istefox.dev website and the Agentwake app: licenses, purchases through Polar, refunds, and the beta program."
+		/>
+	</head>
+	<body>
+		<Header />
+		<main class="legal">
+			<h1>Terms &amp; Conditions</h1>
+			<p class="updated">Last updated: {LAST_UPDATED}</p>
+
+			<h2>1. Who operates this site</h2>
+			<p>
+				istefox.dev and the Agentwake app are operated by Stefano Ferri, an independent software
+				developer based in Italy ("I", "me"). You can reach me at
+				<a href="mailto:stefferri@icloud.com">stefferri@icloud.com</a>. By using this site or
+				Agentwake you accept these terms. If you do not accept them, do not use the site or the
+				app.
+			</p>
+
+			<h2>2. Scope</h2>
+			<p>
+				These terms cover the istefox.dev website (including the blog and project pages) and the
+				Agentwake macOS application, in both its free and paid (Pro) tiers, including the beta
+				program described in section 6. How I handle personal data is described separately in the
+				<a href="/privacy">Privacy Policy</a>.
+			</p>
+
+			<h2>3. Agentwake: Free and Pro</h2>
+			<p>
+				Agentwake is distributed as a signed and notarized DMG for macOS 14 or later. The free
+				tier (including the keyboard-cleaning lock and live agent status) requires no payment and
+				no account. The Pro tier is unlocked by a license key and adds the features listed on the
+				<a href="/agentwake">product page</a>.
+			</p>
+			<p>
+				A Pro license is a personal, non-exclusive, non-transferable right to use Agentwake Pro on
+				Macs you own or control. It is a one-time purchase: no subscription, and all updates are
+				included for the life of the product. You may not resell, sublicense, or share your
+				license key, and you may not reverse engineer the app except where the law expressly
+				permits it.
+			</p>
+
+			<h2>4. Purchases</h2>
+			<p>
+				Polar Software Inc. ("Polar") processes all purchases as merchant of record. This means
+				your sales contract for the payment itself is with Polar: Polar handles the checkout,
+				payment processing, invoicing, and applicable taxes, and emails you the license key.
+				Polar's own terms and privacy policy apply to the checkout. I remain responsible for the
+				app itself and for these terms.
+			</p>
+			<p>
+				Pricing: Agentwake Pro costs €3.99 for the whole of September 2026 and €7.99 from
+				1 October 2026 onward. Prices are stated in euro, taxes handled by Polar at checkout. A
+				price never moves back down once it has risen, and every date is published in advance on
+				the product page.
+			</p>
+
+			<h2>5. Refunds</h2>
+			<p>
+				If Pro is not for you, write to
+				<a href="mailto:stefferri@icloud.com">stefferri@icloud.com</a> within 14 days of purchase
+				and you get a full refund, no questions asked. This sits alongside, and does not limit,
+				any mandatory rights you have as a consumer under EU and Italian law.
+			</p>
+
+			<h2>6. Beta program</h2>
+			<p>
+				Until 31 August 2026 you can join the Agentwake beta by signing up with your email on the
+				product page. Beta testers receive the current build and a free lifetime copy of Pro,
+				activated through a private checkout link delivered by email. The link is personal, works
+				once, and the offer is capped at a limited number of redemptions.
+			</p>
+			<p>
+				The purpose of the beta is to gather feedback before the public launch. Beta builds are
+				pre-release software: they are stable and have been in development and testing for about
+				six months, but features may still change and occasional defects are to be expected.
+				Feedback is welcome through
+				<a href="https://github.com/istefox/Agentwake-releases/issues/new">GitHub Issues</a> or by
+				email; providing feedback is appreciated but never a contractual obligation.
+			</p>
+
+			<h2>7. Updates</h2>
+			<p>
+				Agentwake updates itself through the Sparkle framework: the app checks for a new version,
+				verifies its signature, and installs it. Updates are included with both tiers at no extra
+				cost. I may add, change, or retire individual features over time; a feature you paid for
+				will not be removed from Pro without a functional replacement.
+			</p>
+
+			<h2>8. Acceptable use</h2>
+			<p>
+				You may not use this site or the app to break the law, to probe or disrupt the site's
+				infrastructure, or to circumvent the licensing mechanism. Automated bulk scraping of the
+				site, beyond normal search-engine and AI-assistant indexing, is not permitted.
+			</p>
+
+			<h2>9. Intellectual property</h2>
+			<p>
+				Agentwake, its name, and the content of this site (text, images, screenshots, code
+				samples) belong to me unless stated otherwise. Third-party names mentioned on the site
+				(such as Amphetamine, Adrafinil, Agent Caffeine, Vigil, Claude Code, or Apple trademarks)
+				belong to their respective owners and are used only to identify the products in question.
+			</p>
+
+			<h2>10. Warranty and liability</h2>
+			<p>
+				The free tier and beta builds are provided "as is", without warranty, to the extent the
+				law allows. For paid licenses, the legal guarantee of conformity under EU and Italian
+				consumer law applies in full. Nothing in these terms excludes or limits liability for
+				intent, gross negligence, or any liability that cannot be excluded by law. Beyond that,
+				my liability is limited to the amount you paid for the license.
+			</p>
+			<p>
+				One point specific to what Agentwake does: the app is designed fail-safe, so a missed
+				signal lets your Mac sleep rather than keeping it awake. Still, you remain responsible
+				for supervising long unattended workloads and for your own backups.
+			</p>
+
+			<h2>11. Governing law and disputes</h2>
+			<p>
+				These terms are governed by Italian law. If you are a consumer in the European Union, you
+				also keep the protection of the mandatory rules of your country of residence, and you may
+				bring disputes before the courts of your own country as EU law provides. For everyone
+				else, the competent court is the one of my registered residence in Italy.
+			</p>
+
+			<h2>12. Changes to these terms</h2>
+			<p>
+				I may update these terms as the product and the law evolve. The "last updated" date at
+				the top always reflects the current version, and substantive changes to paid features or
+				refund rights will be announced on the product page before they take effect. Continued
+				use after a change means you accept the updated terms.
+			</p>
+
+			<h2>13. Contact</h2>
+			<p>
+				Questions about these terms:
+				<a href="mailto:stefferri@icloud.com">stefferri@icloud.com</a>.
+			</p>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.legal h1 {
+		margin-bottom: 0.2em;
+	}
+	.updated {
+		color: rgb(var(--gray));
+		font-size: 0.95em;
+		margin-bottom: 2em;
+	}
+	.legal h2 {
+		margin-top: 1.6em;
+		font-size: 1.25em;
+	}
+</style>

@@ -2,7 +2,8 @@
 // Lives in its own file so src/data/agentwake.ts stays untouched for the launch restore:
 // at launch, delete this file and move src/pages/agentwake/preview.astro back to agentwake.astro.
 // The old pre-launch "no prices, no free/paid framing" rule is retired: this page states the
-// beta deal (free lifetime Pro for testers, €7.99 after 31 August 2026) openly. The one hard
+// beta deal openly (free lifetime Pro for testers until 31 August 2026, then €3.99 for all of
+// September 2026 and €7.99 from 1 October 2026 — see ./pricing for the ladder). The one hard
 // rule that remains: the private 100%-off Polar checkout link is email-only and must never
 // appear in this file or on any page (see functions/api/waitlist.ts).
 
@@ -18,9 +19,11 @@ import {
 import type { FaqItem } from "./agentwake";
 import { PRICING } from "./pricing";
 
-// The post-beta list price and the beta deadline, used across the copy below. The date is the
-// expiry of the private Polar discount (capped at 100 redemptions, expires 2026-08-31).
+// Post-beta prices and the beta deadline, used across the copy below. The deadline is the
+// expiry of the private Polar discount (capped at 100 redemptions, expires 2026-08-31);
+// SEPT_PRICE matches the September "launch" step of the ladder in ./pricing.
 const LIST_PRICE = PRICING.listPrice; // "€7.99"
+const SEPT_PRICE = "€3.99";
 const BETA_END_HUMAN = "31 August 2026";
 export const BETA_END_ISO = "2026-08-31";
 
@@ -29,7 +32,7 @@ export const WAITLIST_TITLE =
 
 // Used for <meta description> and OG. Keep ≤160 chars so search results show it uncut.
 export const WAITLIST_META_DESCRIPTION =
-  "Agentwake keeps your Mac awake while AI agents like Claude Code work. Beta testers get Pro free for life until 31 Aug 2026; €7.99 after. macOS 14+.";
+  "Agentwake keeps your Mac awake while AI agents like Claude Code work. Beta testers get Pro free for life; €3.99 in Sept 2026, €7.99 from October. macOS 14+.";
 
 export const WAITLIST_SUBHEAD = HERO.subhead;
 export const WAITLIST_USE_CASES = USE_CASES;
@@ -39,7 +42,7 @@ export const WAITLIST_CHIPS = [
   "macOS 14+, notarized",
   "In development and testing for ~6 months",
   "Beta testers get Pro free, for life",
-  `${LIST_PRICE} after ${BETA_END_HUMAN}`,
+  `${SEPT_PRICE} in September, ${LIST_PRICE} from October 2026`,
 ];
 
 // Screenshots shown inline on the page (keys into SHOT_LIST / src/assets/agentwake).
@@ -55,7 +58,7 @@ export const WAITLIST_SHOT_KEYS = [
 export const BETA_FAQ_EXTRA: FaqItem[] = [
   {
     q: "What is the Agentwake beta program?",
-    a: `Sign up with your email before ${BETA_END_HUMAN} and you get the current Agentwake build plus a free lifetime copy of Pro, delivered by email right after signup. In exchange, you tell us what breaks, what is confusing, and what is missing. After the beta closes, Agentwake Pro costs ${LIST_PRICE} one-time.`,
+    a: `Sign up with your email before ${BETA_END_HUMAN} and you get the current Agentwake build plus a free lifetime copy of Pro, delivered by email right after signup. In exchange, you tell us what breaks, what is confusing, and what is missing. After the beta closes, Agentwake Pro costs ${SEPT_PRICE} during September 2026 and ${LIST_PRICE} one-time from 1 October 2026.`,
   },
   {
     q: "Is the beta stable enough for daily use?",
@@ -63,7 +66,7 @@ export const BETA_FAQ_EXTRA: FaqItem[] = [
   },
   {
     q: "What happens after the beta ends?",
-    a: `Beta testers keep Pro free for life, updates included. From 1 September 2026 new users pay ${LIST_PRICE} one-time. No subscription either way.`,
+    a: `Beta testers keep Pro free for life, updates included. New users pay ${SEPT_PRICE} during September 2026, then ${LIST_PRICE} one-time from 1 October 2026. No subscription either way.`,
   },
 ];
 
@@ -96,7 +99,7 @@ export const WAITLIST_COMPARISON = {
       ? {
           ...r,
           values: [
-            `Free for beta testers (lifetime), ${LIST_PRICE} after 31 Aug 2026`,
+            `Free for beta testers (lifetime); ${SEPT_PRICE} Sept 2026, then ${LIST_PRICE}`,
             ...r.values.slice(1),
           ],
         }
@@ -111,7 +114,7 @@ export const WHY_JOIN = {
     "You get Pro free, for life. The activation link lands in your inbox right after signup, together with the download.",
     "The app is already stable: about six months of development and daily testing on real overnight agent runs.",
     "Your feedback and feature requests decide what ships in the public release.",
-    `The beta closes on ${BETA_END_HUMAN}. After that, Agentwake Pro costs ${LIST_PRICE} one-time.`,
+    `The beta closes on ${BETA_END_HUMAN}. After that, Agentwake Pro costs ${SEPT_PRICE} in September and ${LIST_PRICE} from 1 October 2026.`,
   ],
 };
 
