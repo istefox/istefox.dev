@@ -1,5 +1,5 @@
 ---
-// Email capture for the pre-launch waitlist. Posts to the Cloudflare Pages Function at
+// Email capture for the beta program. Posts to the Cloudflare Pages Function at
 // /api/waitlist (functions/api/waitlist.ts): honeypot + Turnstile + KV storage server-side.
 // JS is required by Turnstile itself, so the no-JS path is a mailto fallback, not a plain POST.
 import { TURNSTILE_SITE_KEY, WAITLIST_FORM } from '../../data/agentwake-waitlist';
@@ -30,7 +30,7 @@ import { TURNSTILE_SITE_KEY, WAITLIST_FORM } from '../../data/agentwake-waitlist
 <noscript>
 	<p class="noscript-note">
 		The form needs JavaScript. Email
-		<a href="mailto:stefferri@icloud.com?subject=Agentwake%20waitlist">stefferri@icloud.com</a>
+		<a href="mailto:stefferri@icloud.com?subject=Agentwake%20beta">stefferri@icloud.com</a>
 		instead and you will be added by hand.
 	</p>
 </noscript>

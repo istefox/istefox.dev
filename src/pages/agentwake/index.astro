@@ -1,10 +1,12 @@
 ---
-// Pre-launch waitlist page at /agentwake. The full landing is parked at ./preview.astro
-// (noindexed, unlinked) until launch; restoring it is a git mv back. Hard rule here:
-// no prices, no free/paid framing, no download links — description + waitlist only.
+// Beta-recruitment page at /agentwake. The full landing is parked at ./preview.astro
+// (noindexed, unlinked) until launch; restoring it is a git mv back. Pricing talk is allowed
+// here (the beta deal is the pitch), with one hard rule: the private 100%-off Polar checkout
+// link is email-only (functions/api/waitlist.ts) and must never render on this or any page.
 import { Image } from 'astro:assets';
 import ProductPage from '../../layouts/ProductPage.astro';
 import WaitlistForm from '../../components/agentwake/WaitlistForm.astro';
+import BetaCta from '../../components/agentwake/BetaCta.astro';
 import ogImage from '../../assets/agentwake/og.png';
 import { HERO, PAIN, HOW_IT_KNOWS, SHOT_LIST } from '../../data/agentwake';
 import {
@@ -17,6 +19,8 @@ import {
 	WAITLIST_COMPARISON,
 	WAITLIST_FAQ,
 	WHY_JOIN,
+	FEEDBACK_SECTION,
+	BETA_END_ISO,
 } from '../../data/agentwake-waitlist';
 
 // Same filename-matching pattern as the landing so new captures are picked up automatically.
@@ -44,6 +48,7 @@ const PATHS: Record<string, string> = {
 	image: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M4 17l5-5 4 4 3-3 4 4"/>',
 	help: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.5 2.5 0 1 1 3.6 2.3c-.9.5-1.1.9-1.1 1.8"/><circle cx="12" cy="17" r=".7" fill="currentColor" stroke="none"/>',
 	bell: '<path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M10.5 21a1.5 1.5 0 0 0 3 0"/>',
+	chat: '<path d="M21 11.5a8.5 8.5 0 0 1-12.4 7.5L3 21l2-5.6A8.5 8.5 0 1 1 21 11.5z"/>',
 	moon: '<path d="M20 14a8 8 0 1 1-9-11 6 6 0 0 0 9 11z"/>',
 	bolt: '<path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/>',
 	keyboard:
@@ -67,8 +72,8 @@ const SITE = Astro.site ?? new URL('https://istefox.dev');
 const ogImageURL = new URL(ogImage.src, SITE).toString();
 const canonical = new URL('/agentwake', SITE).toString();
 
-// JSON-LD. Pre-launch: no downloadUrl, no softwareVersion, and a single PreOrder offer
-// instead of the priced Free/Pro pair — rich-result eligible without revealing pricing.
+// JSON-LD. Beta phase: a single free offer, valid until the beta closes. No downloadUrl or
+// softwareVersion — the download is delivered through the beta signup email, not crawled.
 const appLd = {
 	'@context': 'https://schema.org',
 	'@type': 'SoftwareApplication',
@@ -85,9 +90,11 @@ const appLd = {
 	author: { '@type': 'Person', name: 'Stefano Ferri', url: SITE.toString() },
 	offers: {
 		'@type': 'Offer',
+		name: 'Beta: free lifetime Pro for testers',
 		price: '0',
 		priceCurrency: 'EUR',
-		availability: 'https://schema.org/PreOrder',
+		availability: 'https://schema.org/InStock',
+		priceValidUntil: BETA_END_ISO,
 		url: canonical,
 	},
 };
@@ -116,9 +123,9 @@ const breadcrumbLd = {
 	description={WAITLIST_META_DESCRIPTION}
 	productName="Agentwake"
 	image={ogImage}
-	imageAlt="Agentwake knows when your unattended work is done"
-	ctaHref="#waitlist"
-	ctaLabel="Join the waitlist"
+	imageAlt="Agentwake beta: free lifetime Pro for testers. It knows when your unattended work is done."
+	ctaHref="#beta"
+	ctaLabel="Become a beta tester"
 >
 	<Fragment slot="head">
 		<link rel="preload" as="image" href="/agentwake/hero-ai-coding-mode-poster.jpg" fetchpriority="high" />
@@ -129,10 +136,10 @@ const breadcrumbLd = {
 
 	<!-- 1. Hero -->
 	<section class="hero">
-		<p class="eyebrow">Coming soon to macOS</p>
+		<p class="eyebrow">Open beta for macOS</p>
 		<h1>{HERO.headline}</h1>
 		<p class="subhead">{WAITLIST_SUBHEAD}</p>
-		<a class="btn btn-primary hero-cta" href="#waitlist">Join the waitlist</a>
+		<a class="btn btn-primary hero-cta" href="#beta">Become a beta tester</a>
 		<ul class="chips" role="list">
 			{WAITLIST_CHIPS.map((c) => <li>{c}</li>)}
 		</ul>
@@ -164,12 +171,14 @@ const breadcrumbLd = {
 	<section class="block">
 		<h2><span class="h2ico" set:html={icon('flame')} />{PAIN.title}</h2>
 		<p>{PAIN.body}</p>
+		<BetaCta text="Stop propping the lid open with a book. Test the fix, and keep Pro free for life." />
 	</section>
 
 	<!-- 3. How it knows -->
 	<section class="block">
 		<h2><span class="h2ico" set:html={icon('sparkles')} />{HOW_IT_KNOWS.title}</h2>
 		<p>{HOW_IT_KNOWS.body[0]}</p>
+		<BetaCta text="Six months of testing behind it, your agent runs ahead of it. The beta is open." />
 	</section>
 
 	<!-- 4. A first look -->
@@ -192,6 +201,7 @@ const breadcrumbLd = {
 				))
 			}
 		</div>
+		<BetaCta text="Everything in these screenshots ships in the beta build, today." />
 	</section>
 
 	<!-- 5. Use cases -->
@@ -207,9 +217,11 @@ const breadcrumbLd = {
 				))
 			}
 		</div>
+		<BetaCta text="Whatever your overnight job is, run it on the beta and tell us how it went." />
 	</section>
 
-	<!-- 6. Comparison (minus the Price row) — the strongest signup argument on the page. -->
+	<!-- 6. Comparison — the strongest signup argument on the page. The Price row carries the
+	     beta deal (free lifetime for testers, €7.99 after) instead of the public price ladder. -->
 	<section class="block">
 		<h2><span class="h2ico" set:html={icon('trophy')} />The Amphetamine alternative for AI agents, compared honestly</h2>
 		<p>{WAITLIST_COMPARISON.intro}</p>
@@ -255,10 +267,34 @@ const breadcrumbLd = {
 			</tbody>
 		</table>
 		{WAITLIST_COMPARISON.footnotes.map((p) => <p class="muted">{p}</p>)}
+		<BetaCta text="Every yes in that first column is in the beta build, free for life if you join before 31 August 2026." />
 	</section>
 
-	<!-- 7. Why join + form. The #get alias catches stale /agentwake#get links from the landing era. -->
-	<section class="block waitlist-block" id="waitlist">
+	<!-- 7. Feedback: what the beta is for, and where to send it. -->
+	<section class="block" id="feedback">
+		<h2><span class="h2ico" set:html={icon('chat')} />{FEEDBACK_SECTION.title}</h2>
+		<p>{FEEDBACK_SECTION.intro}</p>
+		<ul class="why-join feedback-kinds" role="list">
+			{FEEDBACK_SECTION.kinds.map((k) => <li>{k}</li>)}
+		</ul>
+		<div class="cards">
+			{
+				FEEDBACK_SECTION.channels.map((c) => (
+					<div class="card">
+						<h3>{c.name}</h3>
+						<p>{c.body}</p>
+						<p class="channel-link">
+							<a href={c.href}>{c.linkLabel}</a>
+						</p>
+					</div>
+				))
+			}
+		</div>
+	</section>
+
+	<!-- 8. Why join + form. The #waitlist and #get aliases catch stale links from earlier eras. -->
+	<section class="block waitlist-block" id="beta">
+		<span id="waitlist" class="anchor-alias" aria-hidden="true"></span>
 		<span id="get" class="anchor-alias" aria-hidden="true"></span>
 		<h2><span class="h2ico" set:html={icon('bell')} />{WHY_JOIN.title}</h2>
 		<ul class="why-join" role="list">
@@ -267,7 +303,7 @@ const breadcrumbLd = {
 		<WaitlistForm />
 	</section>
 
-	<!-- 8. FAQ -->
+	<!-- 9. FAQ -->
 	<section class="block">
 		<h2><span class="h2ico" set:html={icon('help')} />Frequently asked questions</h2>
 		<div class="faq">
@@ -716,6 +752,19 @@ const breadcrumbLd = {
 		height: 0.55em;
 		border-radius: 50%;
 		background: var(--accent);
+	}
+
+	/* Feedback section: reuse the why-join bullet look, left-aligned in the flowing column. */
+	.feedback-kinds {
+		margin: 0 0 1.5em;
+		max-width: none;
+	}
+	.card .channel-link {
+		margin-top: 0.6em;
+	}
+	.channel-link a {
+		color: var(--accent);
+		font-weight: 600;
 	}
 
 	.faq details {

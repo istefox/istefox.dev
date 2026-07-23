@@ -1,0 +1,61 @@
+---
+// Lightweight beta-signup nudge, repeated after each info block on /agentwake. It is an
+// anchor to the single real form (#beta), never a second form: the Turnstile widget and the
+// signup logic exist exactly once on the page (see WaitlistForm.astro).
+interface Props {
+	text?: string;
+	label?: string;
+}
+
+const {
+	text = 'Beta testers get Agentwake Pro free, for life.',
+	label = 'Become a beta tester',
+} = Astro.props;
+---
+
+<aside class="beta-cta">
+	<p>{text}</p>
+	<a class="beta-cta-btn" href="#beta">{label}</a>
+</aside>
+
+<style>
+	.beta-cta {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1em;
+		flex-wrap: wrap;
+		margin-top: 1.5em;
+		padding: 0.9em 1.3em;
+		border: 1px solid rgb(var(--gray-light));
+		border-left: 3px solid var(--accent);
+		border-radius: 12px;
+		background: rgb(var(--bg-elevated));
+	}
+	.beta-cta p {
+		margin: 0;
+		font-size: 0.98rem;
+		color: rgb(var(--gray-dark));
+	}
+	.beta-cta-btn {
+		flex: none;
+		padding: 0.5em 1.2em;
+		font-weight: 700;
+		font-size: 0.95rem;
+		color: #fff;
+		background: var(--accent);
+		border: 1px solid var(--accent);
+		border-radius: 8px;
+		text-decoration: none;
+	}
+	.beta-cta-btn:hover {
+		filter: brightness(1.1);
+	}
+	@media (max-width: 480px) {
+		.beta-cta {
+			flex-direction: column;
+			align-items: stretch;
+			text-align: center;
+		}
+	}
+</style>

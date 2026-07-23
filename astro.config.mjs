@@ -10,8 +10,12 @@ export default defineConfig({
 	integrations: [
 		mdx(),
 		sitemap({
-			// The parked landing preview and the noindex download page must not leak into the sitemap.
-			filter: (page) => !page.includes('/agentwake/preview') && !page.includes('/agentwake/download'),
+			// The parked landing preview and the noindex pages (download, both Polar beta pages)
+			// must not leak into the sitemap. '/agentwake/beta' also matches '/agentwake/beta/success'.
+			filter: (page) =>
+				!page.includes('/agentwake/preview') &&
+				!page.includes('/agentwake/download') &&
+				!page.includes('/agentwake/beta'),
 		}),
 	],
 	fonts: [
