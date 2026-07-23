@@ -1,32 +1,31 @@
 // Agentwake launch price ladder — the single source of truth for every price on the site.
-// Handoff: docs/marketing/website-refactor-handoff-2026-07-18.md (Agentwake app repo), section 5.
 //
-// The ladder: €4.99 from day 0 (public launch) for 14 days, €5.99 through day 42, then the
-// permanent €7.99 list price. Every date shown on the site is real and published in advance;
-// a price never moves back down once it has risen. The only manual steps at each ladder
-// boundary are (a) changing the product price in the Polar dashboard and (b) a rebuild —
-// .github/workflows/scheduled-redeploy.yml handles the rebuild daily once the deploy-hook
-// secret is set.
-//
-// To launch: set LAUNCH_DAY0 to the public launch date (Show HN day) and redeploy.
-export const LAUNCH_DAY0: string | null = null; // e.g. "2026-08-04T00:00:00+02:00"
+// Calendar ladder (fixed dates, no launch-day trigger): the beta runs until 31 August 2026
+// (free lifetime Pro for testers, handled outside this file); Pro sells at €3.99 for the
+// whole of September 2026 and settles at the permanent €7.99 list price from 1 October 2026.
+// Every date shown on the site is real and published in advance; the price never moves back
+// down once it has risen. The only manual step at each boundary is changing the product price
+// in the Polar dashboard (€3.99 on 1 Sep 2026, €7.99 on 1 Oct 2026) — the site itself stays
+// aligned via the daily rebuild in .github/workflows/scheduled-redeploy.yml.
+export const LAUNCH_START = "2026-09-01T00:00:00+02:00";
+export const FULL_PRICE_FROM = "2026-10-01T00:00:00+02:00";
 
-export type LadderStep = "prelaunch" | "launch" | "step2" | "final";
+export type LadderStep = "prelaunch" | "launch" | "final";
 
 export interface Pricing {
   step: LadderStep;
-  /** Display price for the current step, e.g. "€4.99". */
+  /** Display price for the current step, e.g. "€3.99". */
   price: string;
-  /** Same figure for JSON-LD offers.price, e.g. "4.99". */
+  /** Same figure for JSON-LD offers.price, e.g. "3.99". */
   priceNumeric: string;
   /** The permanent list price. */
   listPrice: string;
   /** Next ladder price, null on the final step. */
   nextPrice: string | null;
-  /** When the price next rises. Null when day 0 is unset or on the final step. */
+  /** When the price next rises. Null on the final step. */
   nextDate: Date | null;
   nextDateISO: string | null;
-  /** Human form for copy, e.g. "18 August 2026". */
+  /** Human form for copy, e.g. "1 October 2026". */
   nextDateHuman: string | null;
   /** The banner renders only while a real, dated increase is ahead. */
   showBanner: boolean;
@@ -36,15 +35,9 @@ export interface Pricing {
 }
 
 const STEP_PRICES: Record<Exclude<LadderStep, "prelaunch">, string> = {
-  launch: "€4.99",
-  step2: "€5.99",
+  launch: "€3.99",
   final: "€7.99",
 };
-
-// Boundaries are exact 24h multiples from the day-0 instant. If day 14 or day 42 crosses a
-// Europe/Rome DST change, the flip lands one hour off local midnight; the dates shown on the
-// site are formatted from these same instants, so the page always stays self-consistent.
-const DAY_MS = 24 * 60 * 60 * 1000;
 
 const human = (d: Date) =>
   new Intl.DateTimeFormat("en-GB", {
@@ -55,56 +48,44 @@ const human = (d: Date) =>
   }).format(d);
 
 export function resolvePricing(now: Date = new Date()): Pricing {
-  if (LAUNCH_DAY0 === null) {
+  const launchStart = new Date(LAUNCH_START);
+  const fullPriceFrom = new Date(FULL_PRICE_FROM);
+
+  // Beta phase. The public checkout is not promoted yet, so no banner; the launch price is
+  // already the ladder's September figure for any surface that needs one (e.g. the parked
+  // landing preview).
+  if (now < launchStart) {
     return {
       step: "prelaunch",
       price: STEP_PRICES.launch,
-      priceNumeric: "4.99",
+      priceNumeric: "3.99",
       listPrice: STEP_PRICES.final,
-      nextPrice: STEP_PRICES.step2,
-      nextDate: null,
-      nextDateISO: null,
-      nextDateHuman: null,
+      nextPrice: STEP_PRICES.final,
+      nextDate: fullPriceFrom,
+      nextDateISO: fullPriceFrom.toISOString(),
+      nextDateHuman: human(fullPriceFrom),
       showBanner: false,
       bannerText: null,
       ladderSentence:
-        "Launch price €4.99. It rises to €5.99 two weeks after launch and settles at €7.99 six weeks in. One-time purchase, lifetime updates.",
+        "Launch price €3.99 for all of September 2026, then €7.99 from 1 October 2026. One-time purchase, lifetime updates.",
     };
   }
 
-  const day0 = new Date(LAUNCH_DAY0);
-  const day14 = new Date(day0.getTime() + 14 * DAY_MS);
-  const day42 = new Date(day0.getTime() + 42 * DAY_MS);
-
-  if (now < day14) {
+  if (now < fullPriceFrom) {
     return {
       step: "launch",
       price: STEP_PRICES.launch,
-      priceNumeric: "4.99",
-      listPrice: STEP_PRICES.final,
-      nextPrice: STEP_PRICES.step2,
-      nextDate: day14,
-      nextDateISO: day14.toISOString(),
-      nextDateHuman: human(day14),
-      showBanner: true,
-      bannerText: `Launch price: €4.99 until ${human(day14)}. Then €5.99, and €7.99 from ${human(day42)}. One-time purchase, lifetime updates.`,
-      ladderSentence: `Launch price €4.99 until ${human(day14)}, then €5.99, and €7.99 from ${human(day42)}. One-time purchase, lifetime updates.`,
-    };
-  }
-
-  if (now < day42) {
-    return {
-      step: "step2",
-      price: STEP_PRICES.step2,
-      priceNumeric: "5.99",
+      priceNumeric: "3.99",
       listPrice: STEP_PRICES.final,
       nextPrice: STEP_PRICES.final,
-      nextDate: day42,
-      nextDateISO: day42.toISOString(),
-      nextDateHuman: human(day42),
+      nextDate: fullPriceFrom,
+      nextDateISO: fullPriceFrom.toISOString(),
+      nextDateHuman: human(fullPriceFrom),
       showBanner: true,
-      bannerText: `€5.99 until ${human(day42)}, then the price settles at €7.99. One-time purchase, lifetime updates.`,
-      ladderSentence: `€5.99 until ${human(day42)}, then the price settles at €7.99. One-time purchase, lifetime updates.`,
+      bannerText:
+        "Launch price: €3.99 until 30 September 2026, then €7.99. One-time purchase, lifetime updates.",
+      ladderSentence:
+        "Launch price €3.99 until 30 September 2026, then €7.99 from 1 October. One-time purchase, lifetime updates.",
     };
   }
 
@@ -124,5 +105,5 @@ export function resolvePricing(now: Date = new Date()): Pricing {
 }
 
 // Build-time snapshot. The site is static, so this is evaluated once per deploy; the daily
-// scheduled redeploy keeps it aligned with the calendar once the ladder is running.
+// scheduled redeploy keeps it aligned with the calendar as the ladder boundaries pass.
 export const PRICING: Pricing = resolvePricing();

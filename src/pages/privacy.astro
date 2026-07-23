@@ -1,0 +1,179 @@
+---
+// Privacy Policy for istefox.dev and the Agentwake app, under the GDPR (Regulation (EU)
+// 2016/679) and the Italian Privacy Code (D.lgs. 196/2003 as amended by D.lgs. 101/2018).
+// The processing inventory below is sourced from the repo itself: beta signups in
+// functions/api/waitlist.ts (Cloudflare KV + Turnstile + Resend), purchases via Polar,
+// downloads from GitHub Releases, Sparkle update checks, and the theme/banner storage keys.
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_TITLE } from '../consts';
+
+const LAST_UPDATED = '23 July 2026';
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead
+			title={`Privacy Policy — ${SITE_TITLE}`}
+			description="How istefox.dev and Agentwake handle personal data under the GDPR: what is collected, why, who processes it, and your rights."
+		/>
+	</head>
+	<body>
+		<Header />
+		<main class="legal">
+			<h1>Privacy Policy</h1>
+			<p class="updated">Last updated: {LAST_UPDATED}</p>
+
+			<p>
+				This policy explains how personal data is handled on istefox.dev and in the Agentwake
+				macOS app, under Regulation (EU) 2016/679 (GDPR) and the Italian Privacy Code
+				(Legislative Decree 196/2003, as amended). The short version: the site collects your
+				email only if you sign up for the Agentwake beta, the app itself sends no telemetry, and
+				nothing is sold or shared for advertising.
+			</p>
+
+			<h2>1. Data controller</h2>
+			<p>
+				Stefano Ferri, independent software developer, Italy. Contact:
+				<a href="mailto:stefferri@icloud.com">stefferri@icloud.com</a>.
+			</p>
+
+			<h2>2. What is processed, and why</h2>
+
+			<h3>Beta signup</h3>
+			<p>
+				If you join the Agentwake beta, I process your email address, together with the browser
+				user-agent and referring page of the signup request. The email is used to send you the
+				beta invite (download link and Pro activation link) and, sparingly, beta-related
+				communications; there is no newsletter. Legal basis: performance of the beta agreement
+				you request when you sign up (art. 6(1)(b) GDPR). The data is stored in Cloudflare
+				Workers KV.
+			</p>
+
+			<h3>Anti-abuse check</h3>
+			<p>
+				Cloudflare Turnstile protects the signup form by analysing technical signals from your
+				browser to tell humans from bots. Legal basis: legitimate interest in preventing spam
+				and abuse (art. 6(1)(f) GDPR).
+			</p>
+
+			<h3>Hosting and connection logs</h3>
+			<p>
+				Cloudflare Pages hosts the site. Like any host, Cloudflare processes connection data
+				(IP address, request metadata) to deliver the site and protect it from attacks. Legal
+				basis: legitimate interest in operating and securing the site (art. 6(1)(f) GDPR).
+			</p>
+
+			<h3>Transactional email</h3>
+			<p>
+				Resend delivers the beta invite email, and processes your email address on my behalf
+				solely to deliver that message.
+			</p>
+
+			<h3>Purchases</h3>
+			<p>
+				Polar Software Inc. operates the checkout for Agentwake Pro as merchant of record.
+				Polar collects and processes the data needed for the purchase (name, email, payment and
+				billing details, invoicing) as an independent controller, under its own privacy policy. I
+				receive from Polar the order information needed to support you (such as your email and
+				order reference), never your full payment details.
+			</p>
+
+			<h3>Downloads</h3>
+			<p>
+				GitHub Releases serves the Agentwake DMG download; GitHub processes connection data for
+				that download under its own privacy policy.
+			</p>
+
+			<h2>3. The Agentwake app</h2>
+			<p>
+				Agentwake contains no telemetry and no analytics. The only network calls the app makes
+				are Sparkle update checks against the release feed, license key validation with Polar,
+				and the pricing-table refresh you trigger yourself. The optional token-cost estimate
+				reads usage fields from local Claude Code session files, only after you opt in, and the
+				data never leaves your Mac. Agent hooks report only "this session is alive" heartbeats,
+				locally.
+			</p>
+
+			<h2>4. Cookies and local storage</h2>
+			<p>
+				The site sets no advertising or analytics cookies and uses no tracking. It stores two
+				technical preferences in your browser: your light/dark theme choice (localStorage) and
+				the dismissal of the price banner (sessionStorage). Cloudflare Turnstile may set its own
+				strictly functional cookie while verifying the signup form. None of this requires a
+				cookie banner under the Garante's guidelines on technical cookies.
+			</p>
+
+			<h2>5. Recipients and processors</h2>
+			<p>The services that touch personal data, each bound by its own data processing terms:</p>
+			<ul>
+				<li>Cloudflare, Inc. (hosting, KV storage, Turnstile)</li>
+				<li>Resend (Plus Five Five, Inc.) (transactional email delivery)</li>
+				<li>Polar Software Inc. (checkout, as independent merchant of record)</li>
+				<li>GitHub, Inc. (DMG downloads, release feed, issue tracker if you open an issue)</li>
+			</ul>
+			<p>No data is sold, rented, or shared for advertising purposes.</p>
+
+			<h2>6. Transfers outside the EEA</h2>
+			<p>
+				The providers above are US companies, so data may be processed in the United States.
+				Transfers rely on the EU-US Data Privacy Framework where the provider is certified, or
+				on Standard Contractual Clauses, in line with Chapter V of the GDPR.
+			</p>
+
+			<h2>7. Retention</h2>
+			<p>
+				I keep beta signup data for the duration of the beta program and the launch that
+				follows, then delete it, or sooner if you ask. Hosting and security logs follow
+				Cloudflare's short technical retention. Polar keeps purchase records for as long as tax
+				law requires.
+			</p>
+
+			<h2>8. Your rights</h2>
+			<p>
+				Under articles 15 to 22 of the GDPR you can ask for access to your data, a copy of it,
+				rectification, deletion, restriction of processing, portability, and you can object to
+				processing based on legitimate interest. Just write to
+				<a href="mailto:stefferri@icloud.com">stefferri@icloud.com</a>; I answer within the
+				timeframes the GDPR sets. You also have the right to lodge a complaint with the Italian
+				supervisory authority, the
+				<a href="https://www.garanteprivacy.it" target="_blank" rel="noopener noreferrer"
+					>Garante per la Protezione dei Dati Personali</a
+				>.
+			</p>
+
+			<h2>9. No profiling</h2>
+			<p>
+				No automated decision-making and no profiling take place, on the site or in the app.
+			</p>
+
+			<h2>10. Changes to this policy</h2>
+			<p>
+				If the processing changes (for example, a new provider), I update this page and the date
+				at the top. Substantial changes affecting beta testers get announced by email.
+			</p>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.legal h1 {
+		margin-bottom: 0.2em;
+	}
+	.updated {
+		color: rgb(var(--gray));
+		font-size: 0.95em;
+		margin-bottom: 2em;
+	}
+	.legal h2 {
+		margin-top: 1.6em;
+		font-size: 1.25em;
+	}
+	.legal h3 {
+		margin-top: 1.1em;
+		font-size: 1.05em;
+	}
+</style>
