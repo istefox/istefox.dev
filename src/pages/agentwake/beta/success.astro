@@ -1,0 +1,119 @@
+---
+// Post-checkout confirmation: the Success URL of the private beta Polar Checkout Link, called
+// as /agentwake/beta/success?checkout_id={CHECKOUT_ID}. The site is static, so checkout_id is
+// read client-side and shown only as a support reference — no Polar API lookups. Noindexed and
+// excluded from the sitemap (astro.config.mjs).
+import ProductPage from '../../../layouts/ProductPage.astro';
+import { FEEDBACK_SECTION } from '../../../data/agentwake-waitlist';
+---
+
+<ProductPage
+	title="Agentwake Pro is active: welcome to the beta"
+	description="Your free lifetime copy of Agentwake Pro is active. Download the app and start testing."
+	productName="Agentwake"
+	ctaHref="/agentwake/download"
+	ctaLabel="Download"
+>
+	<Fragment slot="head">
+		<meta name="robots" content="noindex" />
+	</Fragment>
+
+	<section class="success">
+		<h1>Pro is active: free, for life</h1>
+		<p class="lead">
+			Thanks for joining the beta. Your license is on its way from Polar by email, and it stays
+			yours after the beta ends: lifetime updates included, no subscription, nothing to pay later.
+		</p>
+		<a class="dl-btn" href="/agentwake/download">Download Agentwake for macOS 14+</a>
+		<h2>What happens next</h2>
+		<ul class="next">
+			<li>Polar emails you the license key; paste it into the app when asked.</li>
+			<li>Updates arrive in-app through Sparkle: the app checks, verifies, and installs them itself.</li>
+			<li>
+				Then the important part: use it on your real runs, and tell us what breaks or what is
+				missing. <a href={FEEDBACK_SECTION.channels[0].href}>Open a GitHub issue</a> (preferred),
+				or reply to your beta email —
+				<a href="mailto:stefferri@icloud.com?subject=Agentwake%20beta%20feedback">stefferri@icloud.com</a>
+				works too.
+			</li>
+		</ul>
+		<p class="ref muted" id="order-ref" hidden>
+			Order reference: <code id="order-ref-id"></code>. Quote it if you ever write in about this
+			purchase.
+		</p>
+	</section>
+</ProductPage>
+
+<script is:inline>
+	// Static page: pull the checkout_id Polar appends to the Success URL, purely as a support
+	// reference. textContent only — the value is never interpreted as HTML.
+	(() => {
+		const id = new URLSearchParams(location.search).get('checkout_id');
+		const wrap = document.getElementById('order-ref');
+		const slot = document.getElementById('order-ref-id');
+		if (id && wrap && slot) {
+			slot.textContent = id;
+			wrap.hidden = false;
+		}
+	})();
+</script>
+
+<style>
+	.success {
+		max-width: 40rem;
+		margin: 2em auto;
+	}
+	.success h1 {
+		font-size: 2em;
+		letter-spacing: -0.02em;
+		margin-bottom: 0.4em;
+	}
+	.lead {
+		font-size: 1.1em;
+		color: rgb(var(--gray-dark));
+		margin-bottom: 1.5em;
+	}
+	.dl-btn {
+		display: inline-block;
+		padding: 0.7em 1.6em;
+		font-weight: 700;
+		color: #fff;
+		background: var(--accent);
+		border: 1px solid var(--accent);
+		border-radius: 10px;
+		text-decoration: none;
+		margin-bottom: 2em;
+	}
+	.dl-btn:hover {
+		filter: brightness(1.1);
+	}
+	.success h2 {
+		font-size: 1.3em;
+		margin-bottom: 0.5em;
+	}
+	.next {
+		padding-left: 1.2em;
+	}
+	.next li {
+		margin-bottom: 0.7em;
+		color: rgb(var(--gray-dark));
+	}
+	.next a {
+		color: var(--accent);
+		font-weight: 600;
+	}
+	.muted {
+		color: rgb(var(--gray-dark));
+		font-size: 0.9em;
+	}
+	.ref {
+		margin-top: 2em;
+	}
+	.ref code {
+		font-size: 0.95em;
+		background: rgb(var(--bg-elevated));
+		border: 1px solid rgb(var(--gray-light));
+		border-radius: 6px;
+		padding: 0.1em 0.4em;
+	}
+</style>

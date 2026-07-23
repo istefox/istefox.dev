@@ -1,0 +1,71 @@
+---
+// Checkout-recovery page: the Return URL of the private beta Polar Checkout Link. Testers
+// land here when they leave the checkout without completing it. Noindexed and excluded from
+// the sitemap (astro.config.mjs) — it only makes sense arriving from Polar. Hard rule: the
+// private checkout URL itself is email-only (functions/api/waitlist.ts) and never renders here.
+import ProductPage from '../../../layouts/ProductPage.astro';
+---
+
+<ProductPage
+	title="Agentwake beta: checkout not completed"
+	description="Your Agentwake beta activation was not completed. The activation link is in your beta invite email."
+	productName="Agentwake"
+	ctaHref="/agentwake#beta"
+	ctaLabel="Become a beta tester"
+>
+	<Fragment slot="head">
+		<meta name="robots" content="noindex" />
+	</Fragment>
+
+	<section class="recover">
+		<h1>That checkout didn't finish</h1>
+		<p class="lead">
+			No charge, nothing lost: activating your free beta copy of Agentwake Pro is a €0 checkout,
+			and you can retry it whenever you like.
+		</p>
+		<ol class="steps">
+			<li>
+				Open your beta invite email (subject: <em>Your Agentwake beta build is ready</em>) and
+				click the activation link again. It is tied to your signup and works once, so it is
+				still valid if you haven't completed it yet. Check spam if you can't find the email.
+			</li>
+			<li>
+				No email in sight? Write to
+				<a href="mailto:stefferri@icloud.com?subject=Agentwake%20beta%20invite%20missing">stefferri@icloud.com</a>
+				and I'll sort it out by hand.
+			</li>
+			<li>
+				Not signed up yet? <a href="/agentwake#beta">Become a beta tester</a> and the invite
+				email arrives right away.
+			</li>
+		</ol>
+	</section>
+</ProductPage>
+
+<style>
+	.recover {
+		max-width: 40rem;
+		margin: 2em auto;
+	}
+	.recover h1 {
+		font-size: 2em;
+		letter-spacing: -0.02em;
+		margin-bottom: 0.4em;
+	}
+	.lead {
+		font-size: 1.1em;
+		color: rgb(var(--gray-dark));
+		margin-bottom: 1.5em;
+	}
+	.steps {
+		padding-left: 1.2em;
+	}
+	.steps li {
+		margin-bottom: 0.9em;
+		color: rgb(var(--gray-dark));
+	}
+	.steps a {
+		color: var(--accent);
+		font-weight: 600;
+	}
+</style>
