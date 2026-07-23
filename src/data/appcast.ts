@@ -2,16 +2,13 @@
 // points at the latest signed release (the same feed that drives in-app auto-updates). Falls back
 // to a pinned URL if the fetch or parse fails, so the pages never ship a dead button.
 //
-// Repo renamed CleanKey-releases -> Agentwake-releases on 2026-07-19; the old name still
-// redirects. The pinned fallback below intentionally still says "CleanKey" in the filename:
-// that is the real, currently-live release asset name (verified 2026-07-19), since the app's
-// own release pipeline has not yet cut an Agentwake-branded build. Update this fallback once it
-// has, so a build-time fetch failure never ships a link to a stale or wrong-named asset.
+// Pinned fallback verified against the live appcast 2026-07-23: latest release is Agentwake 3.0.0
+// (build 51). Keep this in step by hand whenever it drifts noticeably from the live feed.
 export const APPCAST_URL =
   "https://raw.githubusercontent.com/istefox/Agentwake-releases/main/appcast.xml";
 export const DMG_FALLBACK_URL =
-  "https://github.com/istefox/Agentwake-releases/releases/download/v1.16.1/CleanKey-1.16.1.dmg";
-export const DMG_FALLBACK_VERSION = "1.16.1";
+  "https://github.com/istefox/Agentwake-releases/releases/download/v3.0.0/Agentwake-3.0.0.dmg";
+export const DMG_FALLBACK_VERSION = "3.0.0";
 
 export interface AppcastRelease {
   dmgUrl: string;
